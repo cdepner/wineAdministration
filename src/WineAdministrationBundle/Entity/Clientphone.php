@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Clientphone
  *
- * @ORM\Table(name="ClientPhone", uniqueConstraints={@ORM\UniqueConstraint(name="number_UNIQUE", columns={"number"})}, indexes={@ORM\Index(name="FK_ClientPhone_Client_idx", columns={"clientId"})})
+ * @ORM\Table(name="ClientPhone", uniqueConstraints={@ORM\UniqueConstraint(name="number_UNIQUE", columns={"number"})}, indexes={@ORM\Index(name="IDX_8FAB8477C7440455", columns={"client"})})
  * @ORM\Entity
  */
 class Clientphone
@@ -33,10 +33,29 @@ class Clientphone
      *
      * @ORM\ManyToOne(targetEntity="Client")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="clientId", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="client", referencedColumnName="id")
      * })
      */
-    private $clientid;
+    private $client;
+    
+    public function __construct($number, \Client $client) {
+        $this->setNumber($number);
+        $this->setClient($client);
+    }
 
+    public function getNumber() {
+        return $this->number;
+    }
 
+    public function getClient() {
+        return $this->client;
+    }
+
+    public function setNumber($number) {
+        $this->number = $number;
+    }
+
+    public function setClient(\Client $client) {
+        $this->client = $client;
+    }
 }

@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Region
  *
- * @ORM\Table(name="Region", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQUE_name", columns={"name"})}, indexes={@ORM\Index(name="FK_Region_Country_idx", columns={"countryId"})})
+ * @ORM\Table(name="Region", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQUE_name", columns={"name"})}, indexes={@ORM\Index(name="IDX_8CEF4405373C966", columns={"country"})})
  * @ORM\Entity
  */
 class Region
@@ -33,10 +33,29 @@ class Region
      *
      * @ORM\ManyToOne(targetEntity="Country")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="countryId", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="country", referencedColumnName="id")
      * })
      */
-    private $countryid;
+    private $country;
 
+    public function __construct($name, \Country $country) {
+        $this->setName($name);
+        $this->setCountry($country);
+    }
 
+    public function getName() {
+        return $this->name;
+    }
+
+    public function getCountry() {
+        return $this->country;
+    }
+
+    public function setName($name) {
+        $this->name = $name;
+    }
+
+    public function setCountry(\Country $country) {
+        $this->country = $country;
+    }
 }

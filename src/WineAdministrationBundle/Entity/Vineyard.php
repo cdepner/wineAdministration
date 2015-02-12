@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Vineyard
  *
- * @ORM\Table(name="Vineyard", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQUE_name", columns={"name"})}, indexes={@ORM\Index(name="FK_Vineyard_City_idx", columns={"cityId"}), @ORM\Index(name="FK_Vineyard_Region_idx", columns={"regionId"})})
+ * @ORM\Table(name="Vineyard", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQUE_name", columns={"name"})}, indexes={@ORM\Index(name="IDX_839D4A3D2D5B0234", columns={"city"}), @ORM\Index(name="IDX_839D4A3DF62F176", columns={"region"})})
  * @ORM\Entity
  */
 class Vineyard
@@ -33,20 +33,48 @@ class Vineyard
      *
      * @ORM\ManyToOne(targetEntity="City")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="cityId", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="city", referencedColumnName="id")
      * })
      */
-    private $cityid;
+    private $city;
 
     /**
      * @var \Region
      *
      * @ORM\ManyToOne(targetEntity="Region")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="regionId", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="region", referencedColumnName="id")
      * })
      */
-    private $regionid;
+    private $region;
 
+    public function __construct($name, \City $city, \Region $region) {
+        $this->setName($name);
+        $this->setCity($city);
+        $this->setRegion($region);
+    }
 
+    public function getName() {
+        return $this->name;
+    }
+
+    public function getCity() {
+        return $this->city;
+    }
+
+    public function getRegion() {
+        return $this->region;
+    }
+
+    public function setName($name) {
+        $this->name = $name;
+    }
+
+    public function setCity(\City $city) {
+        $this->city = $city;
+    }
+
+    public function setRegion(\Region $region) {
+        $this->region = $region;
+    }
 }

@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Wine
  *
- * @ORM\Table(name="Wine", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQUE_Name_Vintage", columns={"name", "vintage", "wineTypeId", "vinyardId", "wineKindId"})}, indexes={@ORM\Index(name="FK_Wine_WineType_idx", columns={"wineTypeId"}), @ORM\Index(name="FK_Wine_Vineyard_idx", columns={"vinyardId"}), @ORM\Index(name="FK_Wine_WineKind_idx", columns={"wineKindId"})})
+ * @ORM\Table(name="Wine", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQUE_Name_Vintage", columns={"name", "vintage", "wineType", "vinyard", "wineKind"})}, indexes={@ORM\Index(name="IDX_F63ECB5613D95DE5", columns={"vinyard"}), @ORM\Index(name="IDX_F63ECB56407143A", columns={"wineKind"}), @ORM\Index(name="IDX_F63ECB56B31DFFCA", columns={"wineType"})})
  * @ORM\Entity
  */
 class Wine
@@ -61,30 +61,103 @@ class Wine
      *
      * @ORM\ManyToOne(targetEntity="Vineyard")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="vinyardId", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="vinyard", referencedColumnName="id")
      * })
      */
-    private $vinyardid;
+    private $vinyard;
 
     /**
      * @var \Winekind
      *
      * @ORM\ManyToOne(targetEntity="Winekind")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="wineKindId", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="wineKind", referencedColumnName="id")
      * })
      */
-    private $winekindid;
+    private $winekind;
 
     /**
      * @var \Winetype
      *
      * @ORM\ManyToOne(targetEntity="Winetype")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="wineTypeId", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="wineType", referencedColumnName="id")
      * })
      */
-    private $winetypeid;
+    private $winetype;
 
+    public function __construct($available, $price, $name, \DateTime $vintage, $volume, \Vineyard $vinyard, \Winekind $winekind, \Winetype $winetype) {
+        $this->setAvailable($available);
+        $this->setPrice($price);
+        $this->setName($name);
+        $this->setVintage($vintage);
+        $this->setVolume($volume);
+        $this->setVinyard($vinyard);
+        $this->setWinekind($winekind);
+        $this->setWinetype($winetype);
+    }
 
+    public function getAvailable() {
+        return $this->available;
+    }
+
+    public function getPrice() {
+        return $this->price;
+    }
+
+    public function getName() {
+        return $this->name;
+    }
+
+    public function getVintage() {
+        return $this->vintage;
+    }
+
+    public function getVolume() {
+        return $this->volume;
+    }
+
+    public function getVinyard() {
+        return $this->vinyard;
+    }
+
+    public function getWinekind() {
+        return $this->winekind;
+    }
+
+    public function getWinetype() {
+        return $this->winetype;
+    }
+
+    public function setAvailable($available) {
+        $this->available = $available;
+    }
+
+    public function setPrice($price) {
+        $this->price = $price;
+    }
+
+    public function setName($name) {
+        $this->name = $name;
+    }
+
+    public function setVintage(\DateTime $vintage) {
+        $this->vintage = $vintage;
+    }
+
+    public function setVolume($volume) {
+        $this->volume = $volume;
+    }
+
+    public function setVinyard(\Vineyard $vinyard) {
+        $this->vinyard = $vinyard;
+    }
+
+    public function setWinekind(\Winekind $winekind) {
+        $this->winekind = $winekind;
+    }
+
+    public function setWinetype(\Winetype $winetype) {
+        $this->winetype = $winetype;
+    }
 }

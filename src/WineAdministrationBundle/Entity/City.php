@@ -34,6 +34,30 @@ class City
      * @ORM\Column(name="zipCode", type="integer", nullable=false)
      */
     private $zipcode;
+    
+    
+    public function __construct($name, $zipcode) {
+        $this->setName($name);
+        $this->setZipcode($zipcode);
+    }
 
+    public function getId() {
+        return $this->id;
+    }
 
+    public function getName() {
+        return $this->name;
+    }
+
+    public function getZipcode() {
+        return $this->zipcode;
+    }
+
+    public function setName($name) {
+        $this->name = $name;
+    }
+
+    public function setZipcode($zipcode) {
+        $this->zipcode = $zipcode;
+    }
 }
