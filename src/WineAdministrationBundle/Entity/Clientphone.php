@@ -7,8 +7,22 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Clientphone
  *
- * @ORM\Table(name="ClientPhone", uniqueConstraints={@ORM\UniqueConstraint(name="number_UNIQUE", columns={"number"})}, indexes={@ORM\Index(name="IDX_8FAB8477C7440455", columns={"client"})})
- * @ORM\Entity
+ * @ORM\Table(
+ *     name="ClientPhone",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(
+ *             name="UNIQUE_number",
+ *             columns={"number"}
+ *         )
+ *     },
+ *     indexes={
+ *         @ORM\Index(
+ *              name="FK_Clientphone_Client",
+ *              columns={"client"}
+ *         )
+ *     }
+ * )
+ * @ORM\Entity(repositoryClass="ClientphoneRepository")
  */
 class Clientphone
 {
@@ -31,16 +45,20 @@ class Clientphone
     /**
      * @var \Client
      *
-     * @ORM\ManyToOne(targetEntity="Client")
+     * @ORM\ManyToOne(targetEntity="Client", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="client", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="client", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * })
      */
     private $client;
     
-    public function __construct($number, \Client $client) {
+    public function __construct($number, $client) {
         $this->setNumber($number);
         $this->setClient($client);
+    }
+
+    public function getId() {
+        return $this->id;
     }
 
     public function getNumber() {
@@ -55,7 +73,7 @@ class Clientphone
         $this->number = $number;
     }
 
-    public function setClient(\Client $client) {
+    public function setClient($client) {
         $this->client = $client;
     }
 }

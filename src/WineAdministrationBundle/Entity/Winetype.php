@@ -7,8 +7,16 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Winetype
  *
- * @ORM\Table(name="WineType", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQUE_name", columns={"name"})})
- * @ORM\Entity
+ * @ORM\Table(
+ *     name="WineType",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(
+ *             name="UNIQUE_name",
+ *             columns={"name"}
+ *         )
+ *     }
+ * )
+ * @ORM\Entity(repositoryClass="WinetypeRepository")
  */
 class Winetype
 {
@@ -30,6 +38,10 @@ class Winetype
 
     public function __construct($name) {
         $this->setName($name);
+    }
+
+    public function getId() {
+        return $this->id;
     }
 
     public function getName() {

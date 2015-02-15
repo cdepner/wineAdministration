@@ -7,8 +7,16 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Clientorder
  *
- * @ORM\Table(name="ClientOrder", indexes={@ORM\Index(name="IDX_3ECD8032C7440455", columns={"client"})})
- * @ORM\Entity
+ * @ORM\Table(
+ *     name="ClientOrder",
+ *     indexes={
+ *         @ORM\Index(
+ *             name="FK_Clientorder_Client",
+ *             columns={"client"}
+ *         )
+ *     }
+ * )
+ * @ORM\Entity(repositoryClass="ClientorderRepository")
  */
 class Clientorder
 {
@@ -31,16 +39,20 @@ class Clientorder
     /**
      * @var \Client
      *
-     * @ORM\ManyToOne(targetEntity="Client")
+     * @ORM\ManyToOne(targetEntity="Client", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="client", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="client", referencedColumnName="id", onDelete="SET NULL")
      * })
      */
     private $client;
 
-    public function __construct(\DateTime $orderdate, \Client $client) {
+    public function __construct(\DateTime $orderdate, $client) {
         $this->setOrderdate($orderdate);
         $this->setClient($client);
+    }
+
+    public function getId() {
+        return $this->id;
     }
 
     public function getOrderdate() {
@@ -55,7 +67,7 @@ class Clientorder
         $this->orderdate = $orderdate;
     }
 
-    public function setClient(\Client $client) {
+    public function setClient($client) {
         $this->client = $client;
     }
 }

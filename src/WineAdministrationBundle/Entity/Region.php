@@ -7,8 +7,22 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Region
  *
- * @ORM\Table(name="Region", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQUE_name", columns={"name"})}, indexes={@ORM\Index(name="IDX_8CEF4405373C966", columns={"country"})})
- * @ORM\Entity
+ * @ORM\Table(
+ *     name="Region",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(
+ *             name="UNIQUE_name",
+ *             columns={"name"}
+ *         )
+ *     },
+ *     indexes={
+ *         @ORM\Index(
+ *             name="FK_Region_Country",
+ *             columns={"country"}
+ *         )
+ *     }
+ * )
+ * @ORM\Entity(repositoryClass="RegionRepository")
  */
 class Region
 {
@@ -31,16 +45,20 @@ class Region
     /**
      * @var \Country
      *
-     * @ORM\ManyToOne(targetEntity="Country")
+     * @ORM\ManyToOne(targetEntity="Country", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="country", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="country", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * })
      */
     private $country;
 
-    public function __construct($name, \Country $country) {
+    public function __construct($name, $country) {
         $this->setName($name);
         $this->setCountry($country);
+    }
+
+    public function getId() {
+        return $this->id;
     }
 
     public function getName() {
@@ -55,7 +73,7 @@ class Region
         $this->name = $name;
     }
 
-    public function setCountry(\Country $country) {
+    public function setCountry($country) {
         $this->country = $country;
     }
 }

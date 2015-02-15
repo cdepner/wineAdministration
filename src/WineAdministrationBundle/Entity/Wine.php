@@ -7,8 +7,36 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Wine
  *
- * @ORM\Table(name="Wine", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQUE_Name_Vintage", columns={"name", "vintage", "wineType", "vinyard", "wineKind"})}, indexes={@ORM\Index(name="IDX_F63ECB5613D95DE5", columns={"vinyard"}), @ORM\Index(name="IDX_F63ECB56407143A", columns={"wineKind"}), @ORM\Index(name="IDX_F63ECB56B31DFFCA", columns={"wineType"})})
- * @ORM\Entity
+ * @ORM\Table(
+ *     name="Wine",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(
+ *             name="UNIQUE_Name_Vintage",
+ *             columns={
+ *                 "name",
+ *                 "vintage",
+ *                 "wineType",
+ *                 "vinyard",
+ *                 "wineKind"
+ *             }
+ *         )
+ *     },
+ *     indexes={
+ *         @ORM\Index(
+ *             name="FK_Wine_Vineyard",
+ *             columns={"vinyard"}
+ *         ),
+ *         @ORM\Index(
+ *             name="FK_Wine_Winekind",
+ *             columns={"wineKind"}
+ *         ),
+ *         @ORM\Index(
+ *             name="FK_Wine_Winetype",
+ *             columns={"wineType"}
+ *         )
+ *     }
+ * )
+ * @ORM\Entity(repositoryClass="WineRepository")
  */
 class Wine
 {
@@ -59,9 +87,9 @@ class Wine
     /**
      * @var \Vineyard
      *
-     * @ORM\ManyToOne(targetEntity="Vineyard")
+     * @ORM\ManyToOne(targetEntity="Vineyard", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="vinyard", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="vinyard", referencedColumnName="id", nullable=false, onDelete="NO ACTION")
      * })
      */
     private $vinyard;
@@ -69,9 +97,9 @@ class Wine
     /**
      * @var \Winekind
      *
-     * @ORM\ManyToOne(targetEntity="Winekind")
+     * @ORM\ManyToOne(targetEntity="Winekind", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="wineKind", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="wineKind", referencedColumnName="id", nullable=false, onDelete="NO ACTION")
      * })
      */
     private $winekind;
@@ -79,14 +107,14 @@ class Wine
     /**
      * @var \Winetype
      *
-     * @ORM\ManyToOne(targetEntity="Winetype")
+     * @ORM\ManyToOne(targetEntity="Winetype", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="wineType", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="wineType", referencedColumnName="id", nullable=false, onDelete="NO ACTION")
      * })
      */
     private $winetype;
 
-    public function __construct($available, $price, $name, \DateTime $vintage, $volume, \Vineyard $vinyard, \Winekind $winekind, \Winetype $winetype) {
+    public function __construct($available, $price, $name, \DateTime $vintage, $volume, $vinyard, $winekind, $winetype) {
         $this->setAvailable($available);
         $this->setPrice($price);
         $this->setName($name);
@@ -95,6 +123,10 @@ class Wine
         $this->setVinyard($vinyard);
         $this->setWinekind($winekind);
         $this->setWinetype($winetype);
+    }
+
+    public function getId() {
+        return $this->id;
     }
 
     public function getAvailable() {
@@ -149,15 +181,15 @@ class Wine
         $this->volume = $volume;
     }
 
-    public function setVinyard(\Vineyard $vinyard) {
+    public function setVinyard($vinyard) {
         $this->vinyard = $vinyard;
     }
 
-    public function setWinekind(\Winekind $winekind) {
+    public function setWinekind($winekind) {
         $this->winekind = $winekind;
     }
 
-    public function setWinetype(\Winetype $winetype) {
+    public function setWinetype($winetype) {
         $this->winetype = $winetype;
     }
 }

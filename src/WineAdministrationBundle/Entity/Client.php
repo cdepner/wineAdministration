@@ -7,8 +7,28 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Client
  *
- * @ORM\Table(name="Client", uniqueConstraints={@ORM\UniqueConstraint(name="UINQUE_Name_Street_City", columns={"forename", "surname", "street", "streetNo", "city"})}, indexes={@ORM\Index(name="FK_Client_City_idx", columns={"city"})})
- * @ORM\Entity
+ * @ORM\Table(
+ *     name="Client",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(
+ *             name="UINQUE_Name_Street_City",
+ *             columns={
+ *                 "forename",
+ *                 "surname",
+ *                 "street",
+ *                 "streetNo",
+ *                 "city"
+ *             }
+ *         )
+ *     },
+ *     indexes={
+ *         @ORM\Index(
+ *             name="FK_Client_City",
+ *             columns={"city"}
+ *         )
+ *     }
+ * )
+ * @ORM\Entity(repositoryClass="ClientRepository")
  */
 class Client
 {
@@ -52,19 +72,23 @@ class Client
     /**
      * @var \City
      *
-     * @ORM\ManyToOne(targetEntity="City")
+     * @ORM\ManyToOne(targetEntity="City", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="city", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="city", referencedColumnName="id", nullable=false, onDelete="NO ACTION")
      * })
      */
     private $city;
 
-    public function __construct($forename, $surname, $street, $streetno, \City $city) {
+    public function __construct($forename, $surname, $street, $streetno, $city) {
         $this->setForename($forename);
         $this->setSurname($surname);
         $this->setStreet($street);
         $this->setStreetno($streetno);
         $this->setCity($city);
+    }
+
+    public function getId() {
+        return $this->id;
     }
 
     public function getForename() {
@@ -103,7 +127,7 @@ class Client
         $this->streetno = $streetno;
     }
 
-    public function setCity(\City $city) {
+    public function setCity($city) {
         $this->city = $city;
     }
 }

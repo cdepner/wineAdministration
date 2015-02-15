@@ -7,8 +7,26 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Vineyard
  *
- * @ORM\Table(name="Vineyard", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQUE_name", columns={"name"})}, indexes={@ORM\Index(name="IDX_839D4A3D2D5B0234", columns={"city"}), @ORM\Index(name="IDX_839D4A3DF62F176", columns={"region"})})
- * @ORM\Entity
+ * @ORM\Table(
+ *     name="Vineyard",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(
+ *             name="UNIQUE_name",
+ *             columns={"name"}
+ *         )
+ *     },
+ *     indexes={
+ *         @ORM\Index(
+ *             name="FK_Vineyard_City",
+ *             columns={"city"}
+ *         ),
+ *         @ORM\Index(
+ *             name="FK_Vineyard_Region",
+ *             columns={"region"}
+ *         )
+ *     }
+ * )
+ * @ORM\Entity(repositoryClass="VineyardRepository")
  */
 class Vineyard
 {
@@ -31,9 +49,9 @@ class Vineyard
     /**
      * @var \City
      *
-     * @ORM\ManyToOne(targetEntity="City")
+     * @ORM\ManyToOne(targetEntity="City", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="city", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="city", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * })
      */
     private $city;
@@ -41,17 +59,21 @@ class Vineyard
     /**
      * @var \Region
      *
-     * @ORM\ManyToOne(targetEntity="Region")
+     * @ORM\ManyToOne(targetEntity="Region", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="region", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="region", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * })
      */
     private $region;
 
-    public function __construct($name, \City $city, \Region $region) {
+    public function __construct($name, $city, $region) {
         $this->setName($name);
         $this->setCity($city);
         $this->setRegion($region);
+    }
+
+    public function getId() {
+        return $this->id;
     }
 
     public function getName() {
@@ -70,11 +92,11 @@ class Vineyard
         $this->name = $name;
     }
 
-    public function setCity(\City $city) {
+    public function setCity($city) {
         $this->city = $city;
     }
 
-    public function setRegion(\Region $region) {
+    public function setRegion($region) {
         $this->region = $region;
     }
 }

@@ -7,8 +7,16 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Country
  *
- * @ORM\Table(name="Country", uniqueConstraints={@ORM\UniqueConstraint(name="UNIQUE_name", columns={"name"})})
- * @ORM\Entity
+ * @ORM\Table(
+ *     name="Country",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(
+ *             name="UNIQUE_name",
+ *             columns={"name"}
+ *         )
+ *     }
+ * )
+ * @ORM\Entity(repositoryClass="CountryRepository")
  */
 class Country
 {
@@ -30,6 +38,10 @@ class Country
 
     public function __construct($name) {
         $this->setName($name);
+    }
+
+    public function getId() {
+        return $this->id;
     }
 
     public function getName() {
