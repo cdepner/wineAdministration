@@ -10,9 +10,8 @@ class DefaultController extends Controller
 {
     /**
      * Start Seite
-     * 
+     *
      * @Route("/weinverwaltung/index.jsp")
-     * @Route("/")
      * @Template()
      */
     public function indexAction()

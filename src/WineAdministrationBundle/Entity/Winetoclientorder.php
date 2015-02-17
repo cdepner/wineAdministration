@@ -40,23 +40,9 @@ class Winetoclientorder
     private $id;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=45, nullable=false)
-     */
-    private $name;
-
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="volume", type="float", precision=10, scale=0, nullable=false)
-     */
-    private $volume;
-
-    /**
      * @var integer
      *
-     * @ORM\Column(name="amount", type="integer", nullable=false)
+     * @ORM\Column(name="amount", type="integer")
      */
     private $amount;
 
@@ -68,17 +54,17 @@ class Winetoclientorder
     private $price;
 
     /**
-     * @var \Wine
+     * @var Wine
      *
-     * @ORM\ManyToOne(targetEntity="Wine", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Wine")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="wine", referencedColumnName="id", onDelete="SET NULL")
+     *   @ORM\JoinColumn(name="wine", referencedColumnName="id")
      * })
      */
     private $wine;
 
     /**
-     * @var \Clientorder
+     * @var Clientorder
      *
      * @ORM\ManyToOne(targetEntity="Clientorder", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
@@ -87,66 +73,106 @@ class Winetoclientorder
      */
     private $order;
 
-    public function __construct($amount, $price, $order, $wine) {
+    /**
+     * @param int         $amount
+     * @param float       $price
+     * @param Clientorder $order
+     * @param Wine        $wine
+     */
+    public function __construct($amount, $price, Clientorder $order, Wine $wine)
+    {
         $this->setAmount($amount);
         $this->setPrice($price);
         $this->setOrder($order);
         $this->setWine($wine);
     }
 
-    public function getId() {
+    /**
+     * Gibt die ID einer Wein-zu-Kundenbestellung zurück
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getAmount() {
+    /**
+     * Gibt die Menge eines Weines einer Wein-zu-Kundenbestellung zurück
+     * @return int
+     */
+    public function getAmount()
+    {
         return $this->amount;
     }
 
-    public function getPrice() {
-        return $this->price;
-    }
-
-    public function getOrder() {
-        return $this->order;
-    }
-
-    public function getWine() {
-        return $this->wine;
-    }
-
-    public function setAmount($amount) {
+    /**
+     * Setzt die Menge eines Weines einer Wein-zu-Kundenbestellung
+     *
+     * @param int $amount
+     */
+    public function setAmount($amount)
+    {
         $this->amount = $amount;
     }
 
-    public function setPrice($price) {
+    /**
+     * Gibt den Preis eines Weines einer Wein-zu-Kundenbestellung zurück
+     *
+     * @return float
+     */
+    public function getPrice()
+    {
+        return $this->price;
+    }
+
+    /**
+     * Setzt den Preis eines Weines einer Wein-zu-Kundenbestellung
+     *
+     * @param float $price
+     */
+    public function setPrice($price)
+    {
         $this->price = $price;
     }
 
-    public function setOrder($order) {
+    /**
+     * Gibt die Kundenbestellung einer Wein-zu-Kundenbestellung zurück
+     *
+     * @return Clientorder
+     */
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    /**
+     * Setzt eine Kundenbestellung einer Wein-zu-Kundenbestellung
+     *
+     * @param Clientorder $order
+     */
+    public function setOrder(Clientorder $order)
+    {
         $this->order = $order;
     }
 
-    public function setWine($wine) {
+    /**
+     * Gibt einen Wein einer Wein-zu-Kundenbestellung zurrück
+     *
+     * @return Wine
+     */
+    public function getWine()
+    {
+        return $this->wine;
+    }
+
+    /**
+     * Setzt einen Wein einer Wein-zu-Kundenbestellung
+     *
+     * @param Wine $wine
+     */
+    public function setWine(Wine $wine)
+    {
         $this->wine = $wine;
-    }
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function getVolume()
-    {
-        return $this->volume;
-    }
-
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    public function setVolume($volume)
-    {
-        $this->volume = $volume;
     }
 
 

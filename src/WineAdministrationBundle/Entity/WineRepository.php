@@ -9,21 +9,21 @@ use Doctrine\ORM\EntityRepository;
  */
 class WineRepository extends EntityRepository
 {
-    
+
     /**
      * Suche nach Weinnamen
-     * 
+     *
      * @param String $criteria
-     * 
+     *
      * @return Wine
      */
     public function getWineByName($criteria)
     {
         $qb = $this->createQueryBuilder('w');
         $query = $qb->select('w')
-                ->where($qb->expr()->like('w.name', ':name'))
-                ->setParameter('name', $criteria);
- 
+            ->where($qb->expr()->like('w.name', ':name'))
+            ->setParameter('name', $criteria);
+
         return $query->getQuery()->getResult();
     }
 

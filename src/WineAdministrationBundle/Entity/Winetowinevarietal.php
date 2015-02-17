@@ -40,7 +40,7 @@ class Winetowinevarietal
     private $id;
 
     /**
-     * @var \Wine
+     * @var Wine
      *
      * @ORM\ManyToOne(targetEntity="Wine", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
@@ -50,7 +50,7 @@ class Winetowinevarietal
     private $wine;
 
     /**
-     * @var \Winevarietal
+     * @var Winevarietal
      *
      * @ORM\ManyToOne(targetEntity="Winevarietal", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
@@ -59,28 +59,62 @@ class Winetowinevarietal
      */
     private $winevarietal;
 
-    public function __construct($wine, $winevarietal) {
+    /**
+     * @param Wine         $wine
+     * @param Winevarietal $winevarietal
+     */
+    public function __construct(Wine $wine, Winevarietal $winevarietal)
+    {
         $this->setWine($wine);
         $this->setWinevarietal($winevarietal);
     }
 
-    public function getId() {
+    /**
+     * Gibt die ID einer Wein-zu-Rebsorte zurück
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getWine() {
+    /**
+     * Gibt den Wein einer Wein-zu-Rebsorte zurück
+     *
+     * @return Wine
+     */
+    public function getWine()
+    {
         return $this->wine;
     }
 
-    public function getWinevarietal() {
-        return $this->winevarietal;
-    }
-
-    public function setWine($wine) {
+    /**
+     * Setzt den Wein einer Wein-zu-Rebsorte
+     *
+     * @param Wine $wine
+     */
+    public function setWine(Wine $wine)
+    {
         $this->wine = $wine;
     }
 
-    public function setWinevarietal($winevarietal) {
+    /**
+     * Gibt die Rebsorte einer Wein-zu-Rebsorte zurück
+     *
+     * @return Winevarietal
+     */
+    public function getWinevarietal()
+    {
+        return $this->winevarietal;
+    }
+
+    /**
+     * Setzt die Rebsorte einer Wein-zu-Rebsorte
+     *
+     * @param Winevarietal $winevarietal
+     */
+    public function setWinevarietal(Winevarietal $winevarietal)
+    {
         $this->winevarietal = $winevarietal;
     }
 }

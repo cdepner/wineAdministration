@@ -36,19 +36,41 @@ class Winetype
      */
     private $name;
 
-    public function __construct($name) {
+    /**
+     * @param $name
+     */
+    public function __construct($name)
+    {
         $this->setName($name);
     }
 
-    public function getId() {
+    /**
+     * Gibt die ID eines Weintypen zurück
+     *
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getName() {
+    /**
+     * Gibt den Namen eines Weintypen zurück
+     *
+     * @return string
+     */
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function setName($name) {
+    /**
+     * Setzt den Namen eines Weintypen
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
         $this->name = $name;
     }
 }

@@ -36,19 +36,41 @@ class Winevarietal
      */
     private $name;
 
-    public function __construct($name) {
+    /**
+     * @param $name
+     */
+    public function __construct($name)
+    {
         $this->setName($name);
     }
 
-    public function getId() {
+    /**
+     * Gibt die ID einer Rebsorte zurück
+     *
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getName() {
+    /**
+     * Gibt den Namen einer Rebsorte zurück
+     *
+     * @return string
+     */
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function setName($name) {
+    /**
+     * Setzt den Namen einer Rebsorte
+     *
+     * @param $name
+     */
+    public function setName($name)
+    {
         $this->name = $name;
     }
 }

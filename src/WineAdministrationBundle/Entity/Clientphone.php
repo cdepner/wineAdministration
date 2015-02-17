@@ -43,7 +43,7 @@ class Clientphone
     private $number;
 
     /**
-     * @var \Client
+     * @var Client
      *
      * @ORM\ManyToOne(targetEntity="Client", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
@@ -51,29 +51,64 @@ class Clientphone
      * })
      */
     private $client;
-    
-    public function __construct($number, $client) {
+
+    /**
+     * @param string $number
+     * @param Client $client
+     */
+    public function __construct($number, Client $client)
+    {
         $this->setNumber($number);
         $this->setClient($client);
     }
 
-    public function getId() {
+    /**
+     * Gibt die ID einer Kundentelefonnummer zurück
+     *
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getNumber() {
+    /**
+     * Gibt die Nummer einer Kundentelefonnummer zurück
+     *
+     * @return string
+     */
+    public function getNumber()
+    {
         return $this->number;
     }
 
-    public function getClient() {
-        return $this->client;
-    }
-
-    public function setNumber($number) {
+    /**
+     * Setzt die Nummer einer Kundentelefonnummer
+     *
+     * @param string $number
+     */
+    public function setNumber($number)
+    {
         $this->number = $number;
     }
 
-    public function setClient($client) {
+    /**
+     * Gibt den Kunden einer Kundentelefonnummer zurück
+     *
+     * @return Client
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * Setzt den Kunden einer Kundentelefonnummer
+     *
+     * @param Client $client
+     */
+    public function setClient(Client $client)
+    {
         $this->client = $client;
     }
 }

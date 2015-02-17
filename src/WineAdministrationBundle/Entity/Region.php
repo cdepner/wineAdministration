@@ -43,7 +43,7 @@ class Region
     private $name;
 
     /**
-     * @var \Country
+     * @var Country
      *
      * @ORM\ManyToOne(targetEntity="Country", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
@@ -52,28 +52,63 @@ class Region
      */
     private $country;
 
-    public function __construct($name, $country) {
+    /**
+     * @param string  $name
+     * @param Country $country
+     */
+    public function __construct($name, Country $country)
+    {
         $this->setName($name);
         $this->setCountry($country);
     }
 
-    public function getId() {
+    /**
+     * Gibt die ID einer Region zurück
+     *
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getName() {
+    /**
+     * Gibt den Namen einer Region zurück
+     *
+     * @return string
+     */
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function getCountry() {
-        return $this->country;
-    }
-
-    public function setName($name) {
+    /**
+     * Setzt den Namen einer Region
+     *
+     * @param $name
+     */
+    public function setName($name)
+    {
         $this->name = $name;
     }
 
-    public function setCountry($country) {
+    /**
+     * Gibt das Land einer Region zurück
+     *
+     * @return Country
+     */
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    /**
+     * Setzt das Land einer Region
+     *
+     * @param Country $country
+     */
+    public function setCountry(Country $country)
+    {
         $this->country = $country;
     }
 }

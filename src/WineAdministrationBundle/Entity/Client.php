@@ -70,7 +70,7 @@ class Client
     private $streetno;
 
     /**
-     * @var \City
+     * @var City
      *
      * @ORM\ManyToOne(targetEntity="City", cascade={"persist"})
      * @ORM\JoinColumns({
@@ -79,7 +79,15 @@ class Client
      */
     private $city;
 
-    public function __construct($forename, $surname, $street, $streetno, $city) {
+    /**
+     * @param string $forename
+     * @param string $surname
+     * @param string $street
+     * @param string $streetno
+     * @param City   $city
+     */
+    public function __construct($forename, $surname, $street, $streetno, City $city)
+    {
         $this->setForename($forename);
         $this->setSurname($surname);
         $this->setStreet($street);
@@ -87,47 +95,113 @@ class Client
         $this->setCity($city);
     }
 
-    public function getId() {
+    /**
+     * Gibt die ID eines Kunden zurück
+     *
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getForename() {
+    /**
+     * Gibt den Vornamen eines Kunden zurück
+     *
+     * @return string
+     */
+    public function getForename()
+    {
         return $this->forename;
     }
 
-    public function getSurname() {
-        return $this->surname;
-    }
-
-    public function getStreet() {
-        return $this->street;
-    }
-
-    public function getStreetno() {
-        return $this->streetno;
-    }
-
-    public function getCity() {
-        return $this->city;
-    }
-
-    public function setForename($forename) {
+    /**
+     * Setzt den Vornamen eines Kunden
+     *
+     * @param string $forename
+     */
+    public function setForename($forename)
+    {
         $this->forename = $forename;
     }
 
-    public function setSurname($surname) {
+    /**
+     * Gibt den Nachnamen eines Kunden zurück
+     *
+     * @return string
+     */
+    public function getSurname()
+    {
+        return $this->surname;
+    }
+
+    /**
+     * Setzt den Nachnamen eines Kunden
+     *
+     * @param string $surname
+     */
+    public function setSurname($surname)
+    {
         $this->surname = $surname;
     }
 
-    public function setStreet($street) {
+    /**
+     * Gibt die Straße eines Kunden zurück
+     *
+     * @return string
+     */
+    public function getStreet()
+    {
+        return $this->street;
+    }
+
+    /**
+     * Setzt die Straße eines Kunden
+     *
+     * @param string $street
+     */
+    public function setStreet($street)
+    {
         $this->street = $street;
     }
 
-    public function setStreetno($streetno) {
+    /**
+     * Gibt die Straßennummer eines Kunden zurück
+     *
+     * @return string
+     */
+    public function getStreetno()
+    {
+        return $this->streetno;
+    }
+
+    /**
+     * Setzt die Straßennummer eines Kunden
+     *
+     * @param string $streetno
+     */
+    public function setStreetno($streetno)
+    {
         $this->streetno = $streetno;
     }
 
-    public function setCity($city) {
+    /**
+     * Gibt die Stadt eines Kunden zurück
+     *
+     * @return City
+     */
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    /**
+     * Setzt die Stadt eines Kunden
+     *
+     * @param City $city
+     */
+    public function setCity(City $city)
+    {
         $this->city = $city;
     }
 }

@@ -36,19 +36,41 @@ class Winekind
      */
     private $name;
 
-    public function __construct($name) {
+    /**
+     * @param string $name
+     */
+    public function __construct($name)
+    {
         $this->setName($name);
     }
 
-    public function getId() {
+    /**
+     * Gibt die ID einer Weinart zurück
+     *
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getName() {
+    /**
+     * Gibt den Namen einer Weinart zurück
+     *
+     * @return string
+     */
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function setName($name) {
+    /**
+     * Setzt den Namen einer Weinart
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
         $this->name = $name;
     }
 }

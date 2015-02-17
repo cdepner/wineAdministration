@@ -37,7 +37,7 @@ class Clientorder
     private $orderdate;
 
     /**
-     * @var \Client
+     * @var Client
      *
      * @ORM\ManyToOne(targetEntity="Client", cascade={"persist"})
      * @ORM\JoinColumns({
@@ -46,28 +46,63 @@ class Clientorder
      */
     private $client;
 
-    public function __construct(\DateTime $orderdate, $client) {
+    /**
+     * @param \DateTime $orderdate
+     * @param Client    $client
+     */
+    public function __construct(\DateTime $orderdate, Client $client)
+    {
         $this->setOrderdate($orderdate);
         $this->setClient($client);
     }
 
-    public function getId() {
+    /**
+     * Gibt die ID einer Kundenbestellung zurück
+     *
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getOrderdate() {
+    /**
+     * Gibt das Bestelldatum einer Kundenbestellung zurück
+     *
+     * @return \DateTime
+     */
+    public function getOrderdate()
+    {
         return $this->orderdate;
     }
 
-    public function getClient() {
-        return $this->client;
-    }
-
-    public function setOrderdate(\DateTime $orderdate) {
+    /**
+     * Setzt das Bestelldatum einer Kundenbestellung
+     *
+     * @param \DateTime $orderdate
+     */
+    public function setOrderdate(\DateTime $orderdate)
+    {
         $this->orderdate = $orderdate;
     }
 
-    public function setClient($client) {
+    /**
+     * Gibt den Kunden einer Kundenbestellung zurück
+     *
+     * @return Client
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * Setzt den Kunden einer Kundenbestellung
+     *
+     * @param Client $client
+     */
+    public function setClient(Client $client)
+    {
         $this->client = $client;
     }
 }

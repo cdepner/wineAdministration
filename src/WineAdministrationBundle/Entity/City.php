@@ -45,30 +45,64 @@ class City
      * @ORM\Column(name="zipCode", type="integer", nullable=false)
      */
     private $zipcode;
-    
-    
-    public function __construct($name, $zipcode) {
+
+    /**
+     * @param string $name
+     * @param int    $zipcode
+     */
+    public function __construct($name, $zipcode)
+    {
         $this->setName($name);
         $this->setZipcode($zipcode);
     }
 
-    public function getId() {
+    /**
+     * Gibt die ID einer Stadt zurück
+     *
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getName() {
+    /**
+     * Gibt den Namen einer Stadt zurück
+     *
+     * @return string
+     */
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function getZipcode() {
-        return $this->zipcode;
-    }
-
-    public function setName($name) {
+    /**
+     * Setzt den Namen einer Stadt
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
         $this->name = $name;
     }
 
-    public function setZipcode($zipcode) {
+    /**
+     * Gibt die Postleitzahl einer Stadt zurück
+     *
+     * @return int
+     */
+    public function getZipcode()
+    {
+        return $this->zipcode;
+    }
+
+    /**
+     * Setzt die Postleitzahl einer Stadt
+     *
+     * @param int $zipcode
+     */
+    public function setZipcode($zipcode)
+    {
         $this->zipcode = $zipcode;
     }
 }

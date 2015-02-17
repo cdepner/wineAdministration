@@ -47,7 +47,7 @@ class Vineyard
     private $name;
 
     /**
-     * @var \City
+     * @var City
      *
      * @ORM\ManyToOne(targetEntity="City", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
@@ -57,7 +57,7 @@ class Vineyard
     private $city;
 
     /**
-     * @var \Region
+     * @var Region
      *
      * @ORM\ManyToOne(targetEntity="Region", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
@@ -66,37 +66,85 @@ class Vineyard
      */
     private $region;
 
-    public function __construct($name, $city, $region) {
+    /**
+     * @param string $name
+     * @param City   $city
+     * @param Region $region
+     */
+    public function __construct($name, City $city, Region $region)
+    {
         $this->setName($name);
         $this->setCity($city);
         $this->setRegion($region);
     }
 
-    public function getId() {
+    /**
+     * Gibt die ID eines Weingutes zurück
+     *
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getName() {
+    /**
+     * Gibt den Namen eines Weingutes zurück
+     *
+     * @return string
+     */
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function getCity() {
-        return $this->city;
-    }
-
-    public function getRegion() {
-        return $this->region;
-    }
-
-    public function setName($name) {
+    /**
+     * Setzt den Namen eines Weingutes
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
         $this->name = $name;
     }
 
-    public function setCity($city) {
+    /**
+     * Gibt die Stadt eines Weingutes zurück
+     *
+     * @return City
+     */
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    /**
+     * Setzt die Stadt eines Weingutes
+     *
+     * @param City $city
+     */
+    public function setCity(City $city)
+    {
         $this->city = $city;
     }
 
-    public function setRegion($region) {
+    /**
+     * Gibt die Region eines Weingutes zurück
+     *
+     * @return Region
+     */
+    public function getRegion()
+    {
+        return $this->region;
+    }
+
+    /**
+     * Setzt die Region eines Weingutes
+     *
+     * @param Region $region
+     */
+    public function setRegion(Region $region)
+    {
         $this->region = $region;
     }
 }

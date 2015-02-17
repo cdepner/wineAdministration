@@ -85,17 +85,17 @@ class Wine
     private $volume;
 
     /**
-     * @var \Vineyard
+     * @var Vineyard
      *
      * @ORM\ManyToOne(targetEntity="Vineyard", cascade={"persist"})
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="vinyard", referencedColumnName="id", nullable=false, onDelete="NO ACTION")
      * })
      */
-    private $vinyard;
+    private $vineyard;
 
     /**
-     * @var \Winekind
+     * @var Winekind
      *
      * @ORM\ManyToOne(targetEntity="Winekind", cascade={"persist"})
      * @ORM\JoinColumns({
@@ -105,7 +105,7 @@ class Wine
     private $winekind;
 
     /**
-     * @var \Winetype
+     * @var Winetype
      *
      * @ORM\ManyToOne(targetEntity="Winetype", cascade={"persist"})
      * @ORM\JoinColumns({
@@ -114,82 +114,195 @@ class Wine
      */
     private $winetype;
 
-    public function __construct($available, $price, $name, \DateTime $vintage, $volume, $vinyard, $winekind, $winetype) {
+    /**
+     * @param bool      $available
+     * @param int       $price
+     * @param string    $name
+     * @param \DateTime $vintage
+     * @param float     $volume
+     * @param Vineyard  $vinyard
+     * @param Winekind  $winekind
+     * @param Winetype  $winetype
+     */
+    public function __construct($available, $price, $name, \DateTime $vintage, $volume, Vineyard $vinyard, Winekind $winekind, Winetype $winetype)
+    {
         $this->setAvailable($available);
         $this->setPrice($price);
         $this->setName($name);
         $this->setVintage($vintage);
         $this->setVolume($volume);
-        $this->setVinyard($vinyard);
+        $this->setVineyard($vinyard);
         $this->setWinekind($winekind);
         $this->setWinetype($winetype);
     }
 
-    public function getId() {
+    /**
+     * Gibt die ID eines Weines zurück
+     *
+     * @return int
+     */
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function getAvailable() {
+    /**
+     * Gibt die Verfügbarkeit eines Weines zurück
+     *
+     * @return bool
+     */
+    public function getAvailable()
+    {
         return $this->available;
     }
 
-    public function getPrice() {
-        return $this->price;
-    }
-
-    public function getName() {
-        return $this->name;
-    }
-
-    public function getVintage() {
-        return $this->vintage;
-    }
-
-    public function getVolume() {
-        return $this->volume;
-    }
-
-    public function getVinyard() {
-        return $this->vinyard;
-    }
-
-    public function getWinekind() {
-        return $this->winekind;
-    }
-
-    public function getWinetype() {
-        return $this->winetype;
-    }
-
-    public function setAvailable($available) {
+    /**
+     * Setzt die Verfügbarkeit eines Weines
+     *
+     * @param bool $available
+     */
+    public function setAvailable($available)
+    {
         $this->available = $available;
     }
 
-    public function setPrice($price) {
+    /**
+     * Gibt den Preis eines Weines zurück
+     *
+     * @return float
+     */
+    public function getPrice()
+    {
+        return $this->price;
+    }
+
+    /**
+     * Setzt den Preis eines Weines
+     *
+     * @param float $price
+     */
+    public function setPrice($price)
+    {
         $this->price = $price;
     }
 
-    public function setName($name) {
+    /**
+     * Gibt den Names eines Weine zurück
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Setzt den Namen eines Weines
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
         $this->name = $name;
     }
 
-    public function setVintage(\DateTime $vintage) {
+    /**
+     * Gibt das Altes eines Weines zurück
+     *
+     * @return \DateTime
+     */
+    public function getVintage()
+    {
+        return $this->vintage;
+    }
+
+    /**
+     * Setzt das Alter eines Weines
+     *
+     * @param \DateTime $vintage
+     */
+    public function setVintage(\DateTime $vintage)
+    {
         $this->vintage = $vintage;
     }
 
-    public function setVolume($volume) {
+    /**
+     * Gibt die Füllmenge eines Weines zurück
+     *
+     * @return float
+     */
+    public function getVolume()
+    {
+        return $this->volume;
+    }
+
+    /**
+     * Setzt die Füllmenge eines Weines
+     *
+     * @param float $volume
+     */
+    public function setVolume($volume)
+    {
         $this->volume = $volume;
     }
 
-    public function setVinyard($vinyard) {
-        $this->vinyard = $vinyard;
+    /**
+     * Gibt das Weingut eines Weines zurück
+     *
+     * @return Vineyard
+     */
+    public function getVineyard()
+    {
+        return $this->vineyard;
     }
 
-    public function setWinekind($winekind) {
+    /**
+     * Setzt das Weingut eines Weines
+     *
+     * @param Vineyard $vineyard
+     */
+    public function setVineyard(Vineyard $vineyard)
+    {
+        $this->vineyard = $vineyard;
+    }
+
+    /**
+     * Gibt die Art eines Weines zurück
+     *
+     * @return Winekind
+     */
+    public function getWinekind()
+    {
+        return $this->winekind;
+    }
+
+    /**
+     * Setzt die Art eines Weines
+     *
+     * @param Winekind $winekind
+     */
+    public function setWinekind(Winekind $winekind)
+    {
         $this->winekind = $winekind;
     }
 
-    public function setWinetype($winetype) {
+    /**
+     * Gibt den Typ eines Weines zurück
+     *
+     * @return Winetype
+     */
+    public function getWinetype()
+    {
+        return $this->winetype;
+    }
+
+    /**
+     * Setzt den Typ eines Weines
+     *
+     * @param Winetype $winetype
+     */
+    public function setWinetype(Winetype $winetype)
+    {
         $this->winetype = $winetype;
     }
 }
