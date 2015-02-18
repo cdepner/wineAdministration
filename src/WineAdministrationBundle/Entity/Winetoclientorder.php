@@ -12,13 +12,13 @@ use Doctrine\ORM\Mapping as ORM;
  *     uniqueConstraints={
  *         @ORM\UniqueConstraint(
  *             name="UNIQUE_Wine_Order",
- *             columns={"wine", "order"}
+ *             columns={"wine", "clientOrder"}
  *         )
  *     },
  *     indexes={
  *         @ORM\Index(
  *             name="FK_Winetoclientorder_Order",
- *             columns={"order"}
+ *             columns={"clientOrder"}
  *         ),
  *         @ORM\Index(
  *             name="FK_Winetoclientorder_Wine",
@@ -68,10 +68,10 @@ class Winetoclientorder
      *
      * @ORM\ManyToOne(targetEntity="Clientorder", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="order", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     *   @ORM\JoinColumn(name="clientOrder", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * })
      */
-    private $order;
+    private $clientOrder;
 
     /**
      * @param int         $amount
@@ -142,7 +142,7 @@ class Winetoclientorder
      */
     public function getOrder()
     {
-        return $this->order;
+        return $this->clientOrder;
     }
 
     /**
@@ -152,7 +152,7 @@ class Winetoclientorder
      */
     public function setOrder(Clientorder $order)
     {
-        $this->order = $order;
+        $this->clientOrder = $order;
     }
 
     /**

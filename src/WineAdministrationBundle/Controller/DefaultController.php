@@ -4,7 +4,7 @@ namespace WineAdministrationBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class DefaultController extends Controller
 {
@@ -12,10 +12,9 @@ class DefaultController extends Controller
      * Start Seite
      *
      * @Route("/weinverwaltung/index.jsp")
-     * @Template()
      */
     public function indexAction()
     {
-        return array();
+        return new RedirectResponse($this->generateUrl('wineadministration_webinterface_showwineadministration'));
     }
 }

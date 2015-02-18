@@ -129,8 +129,8 @@ INSERT INTO `WineAdministration`.`Wine` (`available`, `price`, `name`, `vintage`
 -- -----------------------------------------------------
 -- Data for table `WineAdministration`.`WineToClientOrder`
 -- -----------------------------------------------------
-INSERT INTO `WineAdministration`.`WineToClientOrder` (`amount`, `price`, `wine`, `order`) VALUES (12, 45, 3, 1);
-INSERT INTO `WineAdministration`.`WineToClientOrder` (`amount`, `price`, `wine`, `order`) VALUES (1, 4, 1, 2);
+INSERT INTO `WineAdministration`.`WineToClientOrder` (`amount`, `price`, `wine`, `clientOrder`) VALUES (12, 45, 3, 1);
+INSERT INTO `WineAdministration`.`WineToClientOrder` (`amount`, `price`, `wine`, `clientOrder`) VALUES (1, 4, 1, 2);
 
 
 -- -----------------------------------------------------

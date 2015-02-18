@@ -54,7 +54,7 @@ class ApiController extends Controller
             $newClient['streetno']  = $request->request->get('streetno') != null    ? $request->request->get('streetno')            : !$failure = true;
             $newClient['city']      = $request->request->get('city') != null        ? $request->request->get('city')                : !$failure = true;
             $newClient['phone']     = $request->request->get('phone') != null       ? explode(',', $request->request->get('phone')) : !$failure = true;
-            if ($request->request->get('zipcode') != null && is_int($request->request->get('zipcode'))) {
+            if ($request->request->get('zipcode') != null && is_int((int)$request->request->get('zipcode'))) {
                 $newClient['zipcode'] = $request->request->get('zipcode');
             } else {
                 $newClient['zipcode'] = false;
@@ -114,30 +114,31 @@ class ApiController extends Controller
             $newWine['kind']        = $request->request->get('kind') != null        ? $request->request->get('kind')                    : !$failure = true;
             $newWine['type']        = $request->request->get('type') != null        ? $request->request->get('type')                    : !$failure = true;
             $newWine['varietal']    = $request->request->get('varietal') != null    ? explode(',', $request->request->get('varietal'))  : !$failure = true;
-            if ($request->request->get('available') != null && is_bool($request->request->get('available'))) {
-                $newWine['available'] = $request->request->get('available');
+            if ($request->request->get('available') != null && is_bool((boolean)$request->request->get('available'))) {
+                $newWine['available'] = (boolean)$request->request->get('available');
             } else {
+                $newWine['available'] = false;
                 $failure = true;
             }
-            if ($request->request->get('vintage') != null && strlen($request->request->get('vintage')) == 4 && is_int($request->request->get('vintage'))) {
-                $newWine['vintage'] = \DateTime::createFromFormat("Y", $request->request->get('vintage'));
+            if ($request->request->get('vintage') != null && strlen($request->request->get('vintage')) == 4 && is_int((int)$request->request->get('vintage'))) {
+                $newWine['vintage'] = \DateTime::createFromFormat("Y", (int)$request->request->get('vintage'));
             } else {
                 $newWine['vintage'] = false;
                 $failure = true;
             }
-            if ($request->request->get('price') != null && is_float($request->request->get('price'))) {
+            if ($request->request->get('price') != null && is_float((float)$request->request->get('price'))) {
                 $newWine['price'] = $request->request->get('price');
             } else {
                 $newWine['price'] = false;
                 $failure = true;
             }
-            if ($request->request->get('volume') != null && is_float($request->request->get('volume'))) {
+            if ($request->request->get('volume') != null && is_float((float)$request->request->get('volume'))) {
                 $newWine['volume'] = $request->request->get('volume');
             } else {
                 $newWine['volume'] = false;
                 $failure = true;
             }
-            if ($request->request->get('zipcode') != null && is_int($request->request->get('zipcode'))) {
+            if ($request->request->get('zipcode') != null && is_int((int)$request->request->get('zipcode'))) {
                 $newWine['zipcode'] = $request->request->get('zipcode');
             } else {
                 $newWine['zipcode'] = false;
@@ -217,7 +218,7 @@ class ApiController extends Controller
                 $newOrder['wine'] = false;
                 $failure = true;
             }
-            if ($request->request->get('client') != null && is_int($request->request->get('client'))) {
+            if ($request->request->get('client') != null && is_int((int)$request->request->get('client'))) {
                 $newOrder['client'] = $request->request->get('client');
             } else {
                 $newOrder['client'] = false;
@@ -287,11 +288,13 @@ class ApiController extends Controller
             }
             if ($client) {
                 $clientphoneRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientphone');
-                $clientphone = $clientphoneRepo->findOneBy(array('number' => $clientArray['phone']));
-                if (!$clientphone) {
-                    $clientphone = new Clientphone($clientArray['phone'], $client);
-                    $em->persist($clientphone);
-                    $em->flush();
+                foreach ($clientArray['phone'] as $phone) {
+                    $clientphone = $clientphoneRepo->findOneBy(array('number' => $phone));
+                    if (!$clientphone) {
+                        $clientphone = new Clientphone($phone, $client);
+                        $em->persist($clientphone);
+                        $em->flush();
+                    }
                 }
 
                 return $client;
@@ -404,7 +407,7 @@ class ApiController extends Controller
      *
      * @param array $orderArray
      *
-     * @return Clientorder
+     * @return array
      */
     private function addOrder(array $orderArray)
     {
@@ -413,32 +416,39 @@ class ApiController extends Controller
         $client = $clientRepo->findOneBy(array('id' => $orderArray['client']));
         $wineRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Wine');
         $wineArray = array();
+        $wineFound = true;
         foreach ($orderArray['wine'] as $wine) {
+            if (!$wineRepo->findOneBy(array('id' => $wine['id']))) {
+                $wineFound = false;
+            }
             $tmpWine['wine']    = $wineRepo->findOneBy(array('id' => $wine['id']));
             $tmpWine['amount']  = $wine['amount'];
             $tmpWine['price']   = $wine['price'];
             $wineArray[]        = $tmpWine;
         }
-
-        $clientorderRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientorder');
-        $clientorder = $clientorderRepo->findOneBy(array('client' => $client, 'date' => $orderArray['date']));
-        if (!$clientorder) {
-            $clientorder = new Clientorder($orderArray['date'], $client);
-            $em->persist($clientorder);
-            $em->flush();
-        }
-        if ($clientorder) {
-            foreach ($wineArray as $wineorder) {
-                $winetoclientorderRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetoclientorder');
-                $winetoclientorder = $winetoclientorderRepo->findOneBy(array('id' => $wineorder['id']));
-                if (!$winetoclientorder) {
-                    $clientorder = new Winetoclientorder($wineorder['amount'], $wineorder['price'], $clientorder, $wineorder['wine']);
-                    $em->persist($clientorder);
-                    $em->flush();
-                }
+        if ($wineFound && $client) {
+            $clientorderRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientorder');
+            $clientorder = $clientorderRepo->findOneBy(array('client' => $client, 'orderdate' => $orderArray['date']));
+            if (!$clientorder) {
+                $clientorder = new Clientorder($orderArray['date'], $client);
+                $em->persist($clientorder);
+                $em->flush();
             }
+            if ($clientorder) {
+                $wineObj = array();
+                foreach ($wineArray as $wineorder) {
+                    $winetoclientorderRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetoclientorder');
+                    $winetoclientorder = $winetoclientorderRepo->findOneBy(array('clientOrder' => $clientorder, 'wine' => $wineorder['wine']));
+                    if (!$winetoclientorder) {
+                        $winetoclientorder = new Winetoclientorder((int)$wineorder['amount'], (float)$wineorder['price'], $clientorder, $wineorder['wine']);
+                        $em->persist($winetoclientorder);
+                        $em->flush();
+                    }
+                    $wineObj[] = $winetoclientorder;
+                }
 
-            return $clientorder;
+                return $wineObj;
+            }
         }
 
         return null;
@@ -544,13 +554,20 @@ class ApiController extends Controller
     public function showOrderAction($searchCriteria)
     {
         /** @var WinetoclientorderRepository $winetoclientorderRepository */
+        $clientorderRepository = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientorder');
         $winetoclientorderRepository = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetoclientorder');
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
-            $orders = $winetoclientorderRepository->findBy(array('id' => $searchCriteria));
+            $clientorder = $clientorderRepository->findBy(array('id' => $searchCriteria));
+            $orders = $winetoclientorderRepository->findBy(array('clientOrder' => $clientorder));
         } elseif ($searchCriteria != null) {
-            $orders = $winetoclientorderRepository->getOrderByName($searchCriteria);
+            $clientorder = $clientorderRepository->getOrderByName($searchCriteria);
+            $orders = $winetoclientorderRepository->findBy(array('clientOrder' => $clientorder));
         } else {
-            $orders = $winetoclientorderRepository->findAll();
+            $clientorders = $clientorderRepository->findAll();
+            $orders = array();
+            foreach ($clientorders as $clientorder) {
+                $orders = array_merge($orders, $winetoclientorderRepository->findBy(array('clientOrder' => $clientorder)));
+            }
         }
         $orderSorted = $this->getOrderArray($orders);
         $jsonOrder = json_encode($orderSorted);
@@ -659,17 +676,17 @@ class ApiController extends Controller
                 $wine = $this->getWineArray($order->getWine());
                 $client = $this->getClientArray($order->getOrder()->getClient());
                 $orderArray[] = array(
-                    'id'        => $order->getId(),
+                    'id'        => $order->getOrder()->getId(),
                     'orderDate' => $order->getOrder()->getOrderdate(),
                     'client'    => !empty($client) ? $client[0] : null
                 );
-                $wineArray[$order->getId()][] = array(
+                $wineArray[$order->getOrder()->getId()][] = array(
                     'amount'    => $order->getAmount(),
                     'price'     => $order->getPrice(),
                     'wine'      => $wine[0]);
             }
             foreach ($orderArray as $key=>$orderSorted) {
-                $orderArray[$key]['order'] = $wineArray[$orderSorted['id']];
+                $orderArray[$key]['clientOrder'] = $wineArray[$orderSorted['id']];
             }
         }
 
@@ -757,8 +774,8 @@ class ApiController extends Controller
                     $em->flush();
                     //Suchen bzw erzeugen von Telefonnummern für einen Kunden
                     $clientphoneRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientphone');
-                    foreach ($client['phone'] as $phone) {
-                        $clientphone = $clientphoneRepo->findOneBy(array('clientphone' => $phone, 'client' => $client));
+                    foreach ($newClient['phone'] as $phone) {
+                        $clientphone = $clientphoneRepo->findOneBy(array('number' => $phone, 'client' => $client));
                         if (!$clientphone) {
                             $clientphone = new Clientphone($phone, $client);
                             $em->persist($clientphone);
@@ -790,7 +807,7 @@ class ApiController extends Controller
      * @param Request $request
      *
      * @Route(
-     *       "/weinverwaltung/api/edit/wine",
+     *       "/weinverwaltung/api/edit/wine/{searchCriteria}",
      *       requirements = { "searchCriteria" = "[0-9]+" },
      *       methods      = { "GET", "POST" }
      * )
@@ -814,8 +831,8 @@ class ApiController extends Controller
                 $newWine['city']        = $request->request->get('city') != null        ? $request->request->get('city')                    : $wine->getVineyard()->getCity()->getName();
                 $newWine['region']      = $request->request->get('region') != null      ? $request->request->get('type')                    : $wine->getVineyard()->getRegion()->getName();
                 $newWine['country']     = $request->request->get('country') != null     ? $request->request->get('type')                    : $wine->getVineyard()->getRegion()->getCountry()->getName();
-                $newWine['kind']        = $request->request->get('kind') != null        ? $request->request->get('kind')                    : $wine->getWinekind();
-                $newWine['type']        = $request->request->get('type') != null        ? $request->request->get('type')                    : $wine->getWinetype();
+                $newWine['kind']        = $request->request->get('kind') != null        ? $request->request->get('kind')                    : $wine->getWinekind()->getName();
+                $newWine['type']        = $request->request->get('type') != null        ? $request->request->get('type')                    : $wine->getWinetype()->getName();
                 $newWine['varietal']    = $request->request->get('varietal') != null    ? explode(',', $request->request->get('varietal'))  : $this->getWineVarietal($wine);
                 if ($request->request->get('available') != null && is_bool($request->request->get('available'))) {
                     $newWine['available'] = $request->request->get('available');
@@ -877,14 +894,14 @@ class ApiController extends Controller
                         $winekindRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winekind');
                         $winekind = $winekindRepo->findOneBy(array('name' => $newWine['kind']));
                         if (!$winekind) {
-                            $winekind = new Winekind($newWine['name']);
+                            $winekind = new Winekind($newWine['kind']);
                             $em->persist($winekind);
                             $em->flush();
                         }
                         $winetypeRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetype');
                         $winetype = $winetypeRepo->findOneBy(array('name' => $newWine['type']));
                         if (!$winetype) {
-                            $winetype = new Winetype($newWine['name']);
+                            $winetype = new Winetype($newWine['type']);
                             $em->persist($winetype);
                             $em->flush();
                         }
@@ -901,7 +918,7 @@ class ApiController extends Controller
                             $em->flush();
                             $winevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winevarietal');
                             $winetowinevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetowinevarietal');
-                            foreach ($wine['varietal'] as $varietal) {
+                            foreach ($newWine['varietal'] as $varietal) {
                                 $winevarietal = $winevarietalRepo->findOneBy(array('name' => $varietal));
                                 if (!$winevarietal) {
                                     $winevarietal = new Winevarietal($varietal);
@@ -945,11 +962,11 @@ class ApiController extends Controller
      * @Route(
      *       "/weinverwaltung/api/edit/order/{orderId}/wine/{wineId}",
      *       defaults     = {
-     *          "wineId" = null
+     *          "wineId"  = null
      *       },
      *       requirements = {
      *          "orderId" = "[0-9]+",
-     *          "wineId" = "[0-9]+"
+     *          "wineId"  = "[0-9]+"
      *       },
      *       methods      = { "GET", "POST" }
      * )
@@ -970,7 +987,7 @@ class ApiController extends Controller
             if ($wineId != null && is_numeric($wineId)) {
                 $wine = $wineRepo->findOneBy(array('id' => $wineId));
                 if ($wine && $clientorder) {
-                    $winetoclientorder = $winetoclientorderRepo->findOneBy(array('order' => $clientorder, 'wine' => $wine));
+                    $winetoclientorder = $winetoclientorderRepo->findOneBy(array('clientOrder' => $clientorder, 'wine' => $wine));
                     if ($winetoclientorder) {
                         if ($request->request->get('amount') != null && is_int($request->request->get('amount'))) {
                             $newOrder['amount'] = $request->request->get('amount');
