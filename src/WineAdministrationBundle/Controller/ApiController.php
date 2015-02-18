@@ -641,13 +641,13 @@ class ApiController extends Controller
     /**
      * Erzeugt ein Kundenbestellungs Array
      *
-     * @param array|Clientorder $orderObj
+     * @param array|Winetoclientorder $orderObj
      *
      * @return array
      */
     private function getOrderArray($orderObj) {
         $orderArray = array();
-        $orderSorted = array();
+        $wineArray = array();
         if ($orderObj) {
             if (!is_array($orderObj)) {
                 $orders[0] = $orderObj;
@@ -660,27 +660,49 @@ class ApiController extends Controller
                 $client = $this->getClientArray($order->getOrder()->getClient());
                 $orderArray[] = array(
                     'id'        => $order->getId(),
-                    'amount'    => $order->getAmount(),
-                    'price'     => $order->getPrice(),
-                    'orderId'   => $order->getOrder()->getId(),
-                    'wine'      => $wine[0],
-                    'orderdate' => $order->getOrder()->getOrderdate(),
+                    'orderDate' => $order->getOrder()->getOrderdate(),
                     'client'    => !empty($client) ? $client[0] : null
                 );
+                $wineArray[$order->getId()][] = array(
+                    'amount'    => $order->getAmount(),
+                    'price'     => $order->getPrice(),
+                    'wine'      => $wine[0]);
             }
-            foreach ($orderArray as $orderSort) {
-                $orderId = $orderSort['orderId'];
-                unset($orderSort['orderId']);
-                unset($orderSort['client']);
-                $orderSorted[] = array(
-                    'id'        => $orderId,
-                    'client'    => !empty($client) ? $client[0] : null,
-                    'orders'    => array($orderSort)
-                );
+            foreach ($orderArray as $key=>$orderSorted) {
+                $orderArray[$key]['order'] = $wineArray[$orderSorted['id']];
             }
         }
 
-        return $orderSorted;
+        return $orderArray;
+    }
+
+    /**
+     * Erzeugt ein Weinbestellungs Array
+     *
+     * @param array|Winetoclientorder $orderObj
+     *
+     * @return array
+     */
+    private function getWineorderArray($orderObj) {
+        $orderArray = array();
+        $wineArray = array();
+        if ($orderObj) {
+            if (!is_array($orderObj)) {
+                $orders[0] = $orderObj;
+            } else {
+                $orders = $orderObj;
+            }
+            foreach ($orders as $order) {
+                /** @var Winetoclientorder $order */
+                $wine = $this->getWineArray($order->getWine());
+                $wineArray[$order->getId()][] = array(
+                    'amount'    => $order->getAmount(),
+                    'price'     => $order->getPrice(),
+                    'wine'      => $wine[0]);
+            }
+        }
+
+        return $wineArray;
     }
 
     /**
@@ -691,7 +713,6 @@ class ApiController extends Controller
      *
      * @Route(
      *       "/weinverwaltung/api/edit/client/{searchCriteria}",
-     *       defaults     = { "searchCriteria" = null },
      *       requirements = { "searchCriteria" = "[0-9]+" },
      *       methods      = { "GET", "POST" }
      * )
@@ -700,6 +721,10 @@ class ApiController extends Controller
      */
     public function editClientAction($searchCriteria, Request $request)
     {
+        //Default Response für Fehlerhaften Post
+        $response = new Response(json_encode(array('error' => 'Fehlerhafte ID')));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $clientRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Client');
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
             /** @var Client $client */
@@ -721,30 +746,282 @@ class ApiController extends Controller
                     $em->persist($client);
                     $em->flush();
                 }
-                //Editieren des Kunden
-                $client->setForename($newClient['forename']);
-                $client->setSurname($newClient['surname']);
-                $client->setStreet($newClient['street']);
-                $client->setStreetno($newClient['streetno']);
-                $client->setCity($city);
-                $em->persist($client);
-                $em->flush();
-                //Suchen bzw erzeugen von Telefonnummern für einen Kunden
-                $clientphoneRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientphone');
-                foreach ($client['phone'] as $phone) {
-                    $clientphone = $clientphoneRepo->findOneBy(array('clientphone' => $phone, 'client' => $client));
-                    if (!$clientphone) {
-                        $clientphone = new Clientphone($phone, $client);
-                        $em->persist($clientphone);
-                        $em->flush();
+                if ($city) {
+                    //Editieren des Kunden
+                    $client->setForename($newClient['forename']);
+                    $client->setSurname($newClient['surname']);
+                    $client->setStreet($newClient['street']);
+                    $client->setStreetno($newClient['streetno']);
+                    $client->setCity($city);
+                    $em->persist($client);
+                    $em->flush();
+                    //Suchen bzw erzeugen von Telefonnummern für einen Kunden
+                    $clientphoneRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientphone');
+                    foreach ($client['phone'] as $phone) {
+                        $clientphone = $clientphoneRepo->findOneBy(array('clientphone' => $phone, 'client' => $client));
+                        if (!$clientphone) {
+                            $clientphone = new Clientphone($phone, $client);
+                            $em->persist($clientphone);
+                            $em->flush();
+                        }
+                    }
+                    //Wein für JSON Ausgabe vorbereiten
+                    $clientArray = $this->getClientArray($client);
+                    if (!empty($clientArray)) {
+                        $response = new Response(json_encode($clientArray));
+                        $response->headers->set('Content-Type', 'application/json');
+                        $response->setStatusCode(Response::HTTP_OK);
                     }
                 }
-
-                return $this->redirect($this->generateUrl('wineadministration_api_showclient', array('searchCriteria' => $searchCriteria)));
+                //Ausgabe für Fehlerhaften Post
+                $response = new Response(json_encode($newClient));
+                $response->headers->set('Content-Type', 'application/json');
+                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
             }
         }
 
-        return $this->redirect($this->generateUrl('wineadministration_api_showclient', array('searchCriteria' => null)));
+        return $response;
+    }
+
+    /**
+     * Api Wine editieren
+     *
+     * @param string  $searchCriteria Wine ID
+     * @param Request $request
+     *
+     * @Route(
+     *       "/weinverwaltung/api/edit/wine",
+     *       requirements = { "searchCriteria" = "[0-9]+" },
+     *       methods      = { "GET", "POST" }
+     * )
+     *
+     * @return Response json
+     */
+    public function editWineAction($searchCriteria, Request $request)
+    {
+        //Default Response für Fehlerhaften Post
+        $response = new Response(json_encode(array('error' => 'Fehlerhafte ID')));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $wineRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Wine');
+        if ($searchCriteria != null && is_numeric($searchCriteria)) {
+            /** @var Wine $wine */
+            $wine = $wineRepo->findOneBy(array('id' => $searchCriteria));
+            if ($wine && $request->getMethod() == 'POST') {
+
+                $newWine['name']        = $request->request->get('name') != null        ? $request->request->get('name')                    : $wine->getName();
+                $newWine['vinyard']     = $request->request->get('vinyard') != null     ? $request->request->get('vinyard')                 : $wine->getVineyard()->getName();
+                $newWine['city']        = $request->request->get('city') != null        ? $request->request->get('city')                    : $wine->getVineyard()->getCity()->getName();
+                $newWine['region']      = $request->request->get('region') != null      ? $request->request->get('type')                    : $wine->getVineyard()->getRegion()->getName();
+                $newWine['country']     = $request->request->get('country') != null     ? $request->request->get('type')                    : $wine->getVineyard()->getRegion()->getCountry()->getName();
+                $newWine['kind']        = $request->request->get('kind') != null        ? $request->request->get('kind')                    : $wine->getWinekind();
+                $newWine['type']        = $request->request->get('type') != null        ? $request->request->get('type')                    : $wine->getWinetype();
+                $newWine['varietal']    = $request->request->get('varietal') != null    ? explode(',', $request->request->get('varietal'))  : $this->getWineVarietal($wine);
+                if ($request->request->get('available') != null && is_bool($request->request->get('available'))) {
+                    $newWine['available'] = $request->request->get('available');
+                } else {
+                    $newWine['available'] = $wine->getAvailable();
+                }
+                if ($request->request->get('vintage') != null && strlen($request->request->get('vintage')) == 4 && is_int($request->request->get('vintage'))) {
+                    $newWine['vintage'] = \DateTime::createFromFormat("Y", $request->request->get('vintage'));
+                } else {
+                    $newWine['vintage'] = $wine->getVintage();
+                }
+                if ($request->request->get('price') != null && is_float($request->request->get('price'))) {
+                    $newWine['price'] = $request->request->get('price');
+                } else {
+                    $newWine['price'] = $wine->getPrice();
+                }
+                if ($request->request->get('volume') != null && is_float($request->request->get('volume'))) {
+                    $newWine['volume'] = $request->request->get('volume');
+                } else {
+                    $newWine['volume'] = $wine->getVolume();
+                }
+                if ($request->request->get('zipcode') != null && is_int($request->request->get('zipcode'))) {
+                    $newWine['zipcode'] = $request->request->get('zipcode');
+                } else {
+                    $newWine['zipcode'] = $wine->getVineyard()->getCity()->getZipcode();
+                }
+
+                $em = $this->getDoctrine()->getManager();
+                $cityRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:City');
+                $city = $cityRepo->findOneBy(array('name' => $newWine['city'], 'zipcode' => $newWine['zipcode']));
+                if (!$city) {
+                    $city = new City($newWine['city'], $newWine['zipcode']);
+                    $em->persist($city);
+                    $em->flush();
+                }
+                $countryRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Country');
+                $country = $countryRepo->findOneBy(array('name' => $newWine['country']));
+                if (!$country) {
+                    $country = new Country($newWine['country']);
+                    $em->persist($country);
+                    $em->flush();
+                }
+                if ($country) {
+                    $regionRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Region');
+                    $region = $regionRepo->findOneBy(array('name' => $newWine['region']));
+                    if (!$region) {
+                        $region = new Region($newWine['region'], $country);
+                        $em->persist($region);
+                        $em->flush();
+                    }
+                    if ($city && $region) {
+                        $vineyardRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Vineyard');
+                        $vineyard = $vineyardRepo->findOneBy(array('name' => $newWine['vinyard'], 'region' => $region, 'city' => $city));
+                        if (!$vineyard) {
+                            $vineyard = new Vineyard($newWine['vineyard'], $city, $region);
+                            $em->persist($vineyard);
+                            $em->flush();
+                        }
+                        $winekindRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winekind');
+                        $winekind = $winekindRepo->findOneBy(array('name' => $newWine['kind']));
+                        if (!$winekind) {
+                            $winekind = new Winekind($newWine['name']);
+                            $em->persist($winekind);
+                            $em->flush();
+                        }
+                        $winetypeRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetype');
+                        $winetype = $winetypeRepo->findOneBy(array('name' => $newWine['type']));
+                        if (!$winetype) {
+                            $winetype = new Winetype($newWine['name']);
+                            $em->persist($winetype);
+                            $em->flush();
+                        }
+                        if ($vineyard && $winekind && $winetype) {
+                            $wine->setAvailable($newWine['available']);
+                            $wine->setPrice($newWine['price']);
+                            $wine->setName($newWine['name']);
+                            $wine->setVintage($newWine['vintage']);
+                            $wine->setVolume($newWine['volume']);
+                            $wine->setVineyard($vineyard);
+                            $wine->setWinetype($winetype);
+                            $wine->setWinekind($winekind);
+                            $em->persist($wine);
+                            $em->flush();
+                            $winevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winevarietal');
+                            $winetowinevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetowinevarietal');
+                            foreach ($wine['varietal'] as $varietal) {
+                                $winevarietal = $winevarietalRepo->findOneBy(array('name' => $varietal));
+                                if (!$winevarietal) {
+                                    $winevarietal = new Winevarietal($varietal);
+                                    $em->persist($winevarietal);
+                                    $em->flush();
+                                }
+                                $winetowinevarietal = $winetowinevarietalRepo->findOneBy(array('wine' => $wine, 'winevarietal' => $varietal));
+                                if ($winetowinevarietal) {
+                                    $winetowinevarietal = new Winetowinevarietal($wine, $varietal);
+                                    $em->persist($winetowinevarietal);
+                                    $em->flush();
+                                }
+                            }
+                            //Wein für JSON Ausgabe vorbereiten
+                            $wineArray = $this->getWineArray($wine);
+                            if (!empty($wineArray)) {
+                                $response = new Response(json_encode($wineArray));
+                                $response->headers->set('Content-Type', 'application/json');
+                                $response->setStatusCode(Response::HTTP_OK);
+                            }
+                        }
+                    }
+                }
+                //Ausgabe für Fehlerhaften Post
+                $response = new Response(json_encode($newWine));
+                $response->headers->set('Content-Type', 'application/json');
+                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Api Order editieren
+     *
+     * @param string  $orderId Order ID
+     * @param string  $wineId Wine ID
+     * @param Request $request
+     *
+     * @Route(
+     *       "/weinverwaltung/api/edit/order/{orderId}/wine/{wineId}",
+     *       defaults     = {
+     *          "wineId" = null
+     *       },
+     *       requirements = {
+     *          "orderId" = "[0-9]+",
+     *          "wineId" = "[0-9]+"
+     *       },
+     *       methods      = { "GET", "POST" }
+     * )
+     *
+     * @return Response json
+     */
+    public function editOrderAction($orderId, $wineId, Request $request)
+    {
+        //Default Response für Fehlerhaften Post
+        $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $clientorderRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientorder');
+        $wineRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Wine');
+        $winetoclientorderRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetoclientorder');
+        if ($orderId != null && is_numeric($orderId)) {
+            $clientorder = $clientorderRepo->findOneBy(array('id' => $orderId));
+            if ($wineId != null && is_numeric($wineId)) {
+                $wine = $wineRepo->findOneBy(array('id' => $wineId));
+                if ($wine && $clientorder) {
+                    $winetoclientorder = $winetoclientorderRepo->findOneBy(array('order' => $clientorder, 'wine' => $wine));
+                    if ($winetoclientorder) {
+                        if ($request->request->get('amount') != null && is_int($request->request->get('amount'))) {
+                            $newOrder['amount'] = $request->request->get('amount');
+                        } else {
+                            $newOrder['amount'] = $winetoclientorder->getAmount();
+                        }
+                        if ($request->request->get('price') != null && is_float($request->request->get('price'))) {
+                            $newOrder['price'] = $request->request->get('price');
+                        } else {
+                            $newOrder['price'] = $winetoclientorder->getPrice();
+                        }
+                        $winetoclientorder->setAmount($newOrder['amount']);
+                        $winetoclientorder->setPrice($newOrder['price']);
+                    } else {
+                        $failure = false;
+                        if ($request->request->get('amount') != null && is_int($request->request->get('amount'))) {
+                            $newOrder['amount'] = $request->request->get('amount');
+                        } else {
+                            $newOrder['amount'] = false;
+                            $failure = true;
+                        }
+                        if ($request->request->get('price') != null && is_float($request->request->get('price'))) {
+                            $newOrder['price'] = $request->request->get('price');
+                        } else {
+                            $newOrder['price'] = false;
+                            $failure = true;
+                        }
+                        if (!$failure) {
+                            $winetoclientorder = new Winetoclientorder($newOrder['amount'], $newOrder['price'], $clientorder, $wine);
+                            $em = $this->getDoctrine()->getManager();
+                            $em->persist($winetoclientorder);
+                            $em->flush();
+                            //Wein für JSON Ausgabe vorbereiten
+                            $orderArray = $this->getOrderArray($winetoclientorder);
+                            if (!empty($orderArray)) {
+                                $response = new Response(json_encode($orderArray));
+                                $response->headers->set('Content-Type', 'application/json');
+                                $response->setStatusCode(Response::HTTP_OK);
+                            }
+                        } else {
+                            //Ausgabe für Fehlerhaften Post
+                            $response = new Response(json_encode($newOrder));
+                            $response->headers->set('Content-Type', 'application/json');
+                            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $response;
     }
 
     /**
@@ -763,6 +1040,9 @@ class ApiController extends Controller
      */
     public function deleteClientAction($searchCriteria)
     {
+        $response = new Response(json_encode(array('error' => 'Fehlerhafte Kunden ID')));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $clientRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Client');
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
             $client = $clientRepo->findOneBy(array('id' => $searchCriteria));
@@ -770,10 +1050,13 @@ class ApiController extends Controller
                 $em = $this->getDoctrine()->getManager();
                 $em->remove($client);
                 $em->flush();
+                $response = new Response(json_encode($this->getClientArray($clientRepo->findAll())));
+                $response->headers->set('Content-Type', 'application/json');
+                $response->setStatusCode(Response::HTTP_OK);
             }
         }
 
-        return $this->redirect($this->generateUrl('wineadministration_api_showclient', array('searchCriteria' => null)));
+        return $response;
     }
 
     /**
@@ -792,17 +1075,121 @@ class ApiController extends Controller
      */
     public function deleteClientphoneAction($searchCriteria)
     {
+        $response = new Response(json_encode(array('error' => 'Fehlerhafte Telefon ID')));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $clientphoneRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientphone');
+        $clientRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Client');
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
             $clientphone = $clientphoneRepo->findOneBy(array('id' => $searchCriteria));
             if ($clientphone) {
                 $em = $this->getDoctrine()->getManager();
                 $em->remove($clientphone);
                 $em->flush();
+                $response = new Response(json_encode($this->getClientArray($clientRepo->findAll())));
+                $response->headers->set('Content-Type', 'application/json');
+                $response->setStatusCode(Response::HTTP_OK);
             }
         }
 
-        return $this->redirect($this->generateUrl('wineadministration_api_showclient', array('searchCriteria' => null)));
+        return $response;
+    }
+
+    /**
+     * Api Wein löschen
+     *
+     * @param string $searchCriteria
+     *
+     * @Route(
+     *       "/weinverwaltung/api/delete/wine/{searchCriteria}",
+     *       defaults     = { "searchCriteria" = null },
+     *       requirements = { "searchCriteria" = "[0-9]+" },
+     *       methods      = { "GET" }
+     * )
+     *
+     * @return Response json
+     */
+    public function deleteWineAction($searchCriteria)
+    {
+        $response = new Response(json_encode(array('error' => 'Fehlerhafte Wein ID')));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $wineRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Wine');
+        if ($searchCriteria != null && is_numeric($searchCriteria)) {
+            $wine = $wineRepo->findOneBy(array('id' => $searchCriteria));
+            if ($wine) {
+                $em = $this->getDoctrine()->getManager();
+                $wine->setAvailable(false);
+                $em->persist($wine);
+                $em->flush();
+                $response = new Response(json_encode($this->getWineArray($wineRepo->findAll())));
+                $response->headers->set('Content-Type', 'application/json');
+                $response->setStatusCode(Response::HTTP_OK);
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Api Order löschen
+     *
+     * @param string $orderId Wine ID
+     * @param string $wineId Wine ID
+     *
+     * @Route(
+     *       "/weinverwaltung/api/delete/order/{orderId}/wine/{wineId}",
+     *       defaults     = {
+     *          "orderId" = null,
+     *          "wineId"  = null
+     *       },
+     *       requirements = {
+     *          "orderId" = "[0-9]+",
+     *          "wineId"  = "[0-9]+"
+     *       },
+     *       methods      = { "GET" }
+     * )
+     *
+     * @return Response json
+     */
+    public function deleteOrderAction($orderId, $wineId)
+    {
+        $clientorderRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientorder');
+        $wineRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Wine');
+        $winetoclientorderRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetoclientorder');
+        $em = $this->getDoctrine()->getManager();
+        $clientorder = $clientorderRepo->findOneBy(array('id' => $orderId));
+        if ($wineId != null && is_numeric($wineId)) {
+            $wine = $wineRepo->findOneBy(array('id' => $wineId));
+            if ($wine && $clientorder) {
+                $winetoclientorder = $winetoclientorderRepo->findOneBy(array('wine' => $wine, 'order' => $clientorder));
+                if ($winetoclientorder) {
+                    $em->remove($winetoclientorder);
+                    $em->flush();
+                    $response = new Response(json_encode($this->getOrderArray($winetoclientorderRepo->findAll())));
+                    $response->headers->set('Content-Type', 'application/json');
+                    $response->setStatusCode(Response::HTTP_OK);
+                }
+            } else {
+                $response = new Response(json_encode(array('error' => 'Fehlerhafte Wein ID')));
+                $response->headers->set('Content-Type', 'application/json');
+                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+            }
+        } else {
+            if ($clientorder) {
+                $em->remove($clientorder);
+                $em->flush();
+                $response = new Response(json_encode($this->getOrderArray($winetoclientorderRepo->findAll())));
+                $response->headers->set('Content-Type', 'application/json');
+                $response->setStatusCode(Response::HTTP_OK);
+            } else {
+                $response = new Response(json_encode(array('error' => 'Fehlerhafte Bestell ID')));
+                $response->headers->set('Content-Type', 'application/json');
+                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        return $response;
     }
 
     /**
@@ -828,159 +1215,6 @@ class ApiController extends Controller
     }
 
     /**
-     * Api Client editieren
-     *
-     * @param string  $searchCriteria Cleint ID
-     * @param Request $request
-     *
-     * @Route(
-     *       "/weinverwaltung/api/edit/wine",
-     *       methods      = { "GET", "POST" }
-     * )
-     *
-     * @return Response json
-     */
-    public function editWineAction($searchCriteria, Request $request)
-    {
-        $wineRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Wine');
-        if ($searchCriteria != null && is_numeric($searchCriteria)) {
-            /** @var Wine $wine */
-            $wine = $wineRepo->findOneBy(array('id' => $searchCriteria));
-            if ($wine && $request->getMethod() == 'POST') {
-
-                $newWine['available']   = $request->request->get('available') != null   ? $request->request->get('available')               : $wine->getAvailable();
-                $newWine['price']       = $request->request->get('price') != null       ? $request->request->get('price')                   : $wine->getPrice();
-                $newWine['name']        = $request->request->get('name') != null        ? $request->request->get('name')                    : $wine->getName();
-                $newWine['vineyard']    = $request->request->get('vintage') != null     ? $request->request->get('vineyard')                : $wine->getVineyard()->getName();
-                $newWine['volume']      = $request->request->get('volume') != null      ? $request->request->get('volume')                  : $wine->getVolume();
-                $newWine['city']        = $request->request->get('city') != null        ? $request->request->get('city')                    : $wine->getVineyard()->getCity()->getName();
-                $newWine['zipcode']     = $request->request->get('zipcode') != null     ? $request->request->get('zipcode')                 : $wine->getVineyard()->getCity()->getZipcode();
-                $newWine['region']      = $request->request->get('region') != null      ? $request->request->get('type')                    : $wine->getVineyard()->getRegion()->getName();
-                $newWine['country']     = $request->request->get('country') != null     ? $request->request->get('type')                    : $wine->getVineyard()->getRegion()->getCountry()->getName();
-                $newWine['kind']        = $request->request->get('kind') != null        ? $request->request->get('kind')                    : $wine->getWinekind();
-                $newWine['type']        = $request->request->get('type') != null        ? $request->request->get('type')                    : $wine->getWinetype();
-                $newWine['varietal']    = $request->request->get('varietal') != null    ? explode(',', $request->request->get('varietal'))  : $this->getWineVarietal($wine);
-                if ($request->request->get('vintage') != null && strlen($request->request->get('vintage')) == 4 && is_numeric($request->request->get('vintage'))) {
-                    $newWine['vintage'] = \DateTime::createFromFormat("Y", $request->request->get('vintage'));
-                } else {
-                    $wine->getVintage();
-                }
-
-                $em = $this->getDoctrine()->getManager();
-                $cityRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:City');
-                $city = $cityRepo->findOneBy(array('name' => $newWine['city'], 'zipcode' => $newWine['zipcode']));
-                if (!$city) {
-                    $city = new City($newWine['city'], $newWine['zipcode']);
-                    $em->persist($city);
-                    $em->flush();
-                }
-                $countryRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Country');
-                $country = $countryRepo->findOneBy(array('name' => $newWine['country']));
-                if (!$country) {
-                    $country = new Country($newWine['country']);
-                    $em->persist($country);
-                    $em->flush();
-                }
-                $regionRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Region');
-                $region = $regionRepo->findOneBy(array('name' => $newWine['region']));
-                if (!$region) {
-                    $region = new Region($newWine['region'], $country);
-                    $em->persist($region);
-                    $em->flush();
-                }
-                $vineyardRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Vineyard');
-                $vineyard = $vineyardRepo->findOneBy(array('name' => $newWine['vinyard'], 'region' => $region, 'city' => $city));
-                if (!$vineyard) {
-                    $vineyard = new Vineyard($newWine['vineyard'], $city, $region);
-                    $em->persist($vineyard);
-                    $em->flush();
-                }
-                $winekindRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winekind');
-                $winekind = $winekindRepo->findOneBy(array('name' => $newWine['kind']));
-                if (!$winekind) {
-                    $winekind = new Winekind($newWine['name']);
-                    $em->persist($winekind);
-                    $em->flush();
-                }
-                $winetypeRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetype');
-                $winetype = $winetypeRepo->findOneBy(array('name' => $newWine['type']));
-                if (!$winetype) {
-                    $winetype = new Winetype($newWine['name']);
-                    $em->persist($winetype);
-                    $em->flush();
-                }
-                $vineyardRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Vineyard');
-                $vineyard = $vineyardRepo->findOneBy(array('name' => $newWine['vinyard'], 'region', 'city' => $city));
-                if (!$vineyard) {
-                    $vineyard = new Vineyard($newWine['vineyard'], $city, $region);
-                    $em->persist($vineyard);
-                    $em->flush();
-                }
-                $wine->setAvailable($newWine['available']);
-                $wine->setPrice($newWine['price']);
-                $wine->setName($newWine['name']);
-                $wine->setVintage($newWine['vintage']);
-                $wine->setVolume($newWine['volume']);
-                $wine->setVineyard($vineyard);
-                $wine->setWinetype($winetype);
-                $wine->setWinekind($winekind);
-                $em->persist($wine);
-                $em->flush();
-                $winevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winevarietal');
-                $winetowinevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetowinevarietal');
-                foreach ($wine['varietal'] as $varietal) {
-                    $winevarietal = $winevarietalRepo->findOneBy(array('name' =>$varietal));
-                    if (!$winevarietal) {
-                        $winevarietal = new Winevarietal($varietal);
-                        $em->persist($winevarietal);
-                        $em->flush();
-                    }
-                    $winetowinevarietal = $winetowinevarietalRepo->findOneBy(array('wine' => $wine, 'winevarietal' => $varietal));
-                    if ($winetowinevarietal) {
-                        $winetowinevarietal = new Winetowinevarietal($wine, $varietal);
-                        $em->persist($winetowinevarietal);
-                        $em->flush();
-                    }
-                }
-
-                return $this->redirect($this->generateUrl('wineadministration_api_showclient', array('searchCriteria' => $searchCriteria)));
-            }
-        }
-
-        return $this->redirect($this->generateUrl('wineadministration_api_showclient', array('searchCriteria' => null)));
-    }
-
-    /**
-     * Api Wein löschen
-     *
-     * @param string $searchCriteria
-     *
-     * @Route(
-     *       "/weinverwaltung/api/delete/wine/{searchCriteria}",
-     *       defaults     = { "searchCriteria" = null },
-     *       requirements = { "searchCriteria" = "[0-9]+" },
-     *       methods      = { "GET" }
-     * )
-     *
-     * @return Response json
-     */
-    public function deleteWineAction($searchCriteria)
-    {
-        $wineRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Wine');
-        if ($searchCriteria != null && is_numeric($searchCriteria)) {
-            $wine = $wineRepo->findOneBy(array('id' => $searchCriteria));
-            if ($wine) {
-                $em = $this->getDoctrine()->getManager();
-                $wine->setAvailable(false);
-                $em->persist($wine);
-                $em->flush();
-            }
-        }
-
-        return $this->showWineAction(null);
-    }
-
-    /**
      * Holen der Weinrebsorten zum Wein
      *
      * @param String $wine
@@ -1000,61 +1234,5 @@ class ApiController extends Controller
         }
 
         return $winevarietalsArray;
-    }
-
-    /**
-     * Api Client editieren
-     *
-     * @param string  $searchCriteria Client ID
-     * @param Request $request
-     *
-     * @Route(
-     *       "/weinverwaltung/api/edit/client/{searchCriteria}",
-     *       defaults     = { "searchCriteria" = null },
-     *       requirements = { "searchCriteria" = "[0-9]+" },
-     *       methods      = { "GET", "POST" }
-     * )
-     *
-     * @return Response json
-     */
-    public function editOrderAction($searchCriteria, Request $request)
-    {
-        /**
-        $clientorderRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientorder');
-        $winetoclientorderRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetoclientorder');
-        if ($searchCriteria != null && is_numeric($searchCriteria)) {
-            $clientorder = $clientorderRepo->findOneBy(array('id' => $searchCriteria));
-            $winetoclientorder = $winetoclientorderRepo->findOneBy(array('order' => $clientorder));
-            if ($clientorder && $request->getMethod() == 'POST') {
-                $newOrder['client'] = $request->request->get('client') != null  ? $request->request->get('client')                                      : $clientorder->getClient();
-                $newOrder['date']   = $request->request->get('date') != null    ? \DateTime::createFromFormat("Y-m-d", $request->request->get('date'))  : $clientorder->getOrderdate();
-
-                $newOrder['wine'] = array();
-                if ($request->request->get('wine') != null && is_array($request->request->get('wine'))) {
-                    $wine = $request->request->get('wine');
-                    if (!empty($wine['id'])) {
-                        $newOrder['wine']['id'] = $wine['id'];
-                    } else {
-                        $newOrder['wine']['id'] = $winetoclientorder->getId();
-                    }
-                    if (!empty($wine['price'])) {
-                        $newOrder['wine']['price'] = $wine['price'];
-                    } else {
-                        $newOrder['wine']['price'] = $winetoclientorder->getPrice();
-                    }
-                    if (!empty($wine['amount'])) {
-                        $newOrder['wine']['amount'] = $wine['amount'];
-                    } else {
-                        $newOrder['wine']['amount'] = $winetoclientorder->getAmount();
-                    }
-                }
-
-                $em = $this->getDoctrine()->getManager();
-
-                return $this->redirect($this->generateUrl('wineadministration_api_showclient', array('searchCriteria' => $searchCriteria)));
-            }
-        }
-*/
-        return $this->redirect($this->generateUrl('wineadministration_api_showclient', array('searchCriteria' => null)));
     }
 }
