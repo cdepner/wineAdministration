@@ -48,14 +48,14 @@ class ApiController extends Controller
             $response->setStatusCode(Response::HTTP_BAD_REQUEST);
             $failure = false;
             //Post überprüfung
-            $newClient['forename']  = $request->request->get('forename') != null    ? $request->request->get('forename')            : !$failure = true;
-            $newClient['surname']   = $request->request->get('surname') != null     ? $request->request->get('surname')             : !$failure = true;
-            $newClient['street']    = $request->request->get('street') != null      ? $request->request->get('street')              : !$failure = true;
-            $newClient['streetno']  = $request->request->get('streetno') != null    ? $request->request->get('streetno')            : !$failure = true;
-            $newClient['city']      = $request->request->get('city') != null        ? $request->request->get('city')                : !$failure = true;
-            $newClient['phone']     = $request->request->get('phone') != null       ? explode(',', $request->request->get('phone')) : !$failure = true;
-            if ($request->request->get('zipcode') != null && is_int((int)$request->request->get('zipcode'))) {
-                $newClient['zipcode'] = $request->request->get('zipcode');
+            $newClient['forename']  = $request->get('forename') != null    ? $request->get('forename')            : !$failure = true;
+            $newClient['surname']   = $request->get('surname') != null     ? $request->get('surname')             : !$failure = true;
+            $newClient['street']    = $request->get('street') != null      ? $request->get('street')              : !$failure = true;
+            $newClient['streetno']  = $request->get('streetno') != null    ? $request->get('streetno')            : !$failure = true;
+            $newClient['city']      = $request->get('city') != null        ? $request->get('city')                : !$failure = true;
+            $newClient['phone']     = $request->get('phone') != null       ? explode(',', $request->get('phone')) : !$failure = true;
+            if ($request->get('zipcode') != null && is_int((int)$request->get('zipcode'))) {
+                $newClient['zipcode'] = $request->get('zipcode');
             } else {
                 $newClient['zipcode'] = false;
                 $failure = true;
@@ -106,40 +106,40 @@ class ApiController extends Controller
             $response->setStatusCode(Response::HTTP_BAD_REQUEST);
             $failure = false;
             //Post überprüfung
-            $newWine['name']        = $request->request->get('name') != null        ? $request->request->get('name')                    : !$failure = true;
-            $newWine['vinyard']     = $request->request->get('vinyard') != null     ? $request->request->get('vinyard')                 : !$failure = true;
-            $newWine['city']        = $request->request->get('city') != null        ? $request->request->get('city')                    : !$failure = true;
-            $newWine['region']      = $request->request->get('region') != null      ? $request->request->get('type')                    : !$failure = true;
-            $newWine['country']     = $request->request->get('country') != null     ? $request->request->get('type')                    : !$failure = true;
-            $newWine['kind']        = $request->request->get('kind') != null        ? $request->request->get('kind')                    : !$failure = true;
-            $newWine['type']        = $request->request->get('type') != null        ? $request->request->get('type')                    : !$failure = true;
-            $newWine['varietal']    = $request->request->get('varietal') != null    ? explode(',', $request->request->get('varietal'))  : !$failure = true;
-            if ($request->request->get('available') != null && is_bool((boolean)$request->request->get('available'))) {
-                $newWine['available'] = (boolean)$request->request->get('available');
+            $newWine['name']        = $request->get('name') != null        ? $request->get('name')                    : !$failure = true;
+            $newWine['vinyard']     = $request->get('vinyard') != null     ? $request->get('vinyard')                 : !$failure = true;
+            $newWine['city']        = $request->get('city') != null        ? $request->get('city')                    : !$failure = true;
+            $newWine['region']      = $request->get('region') != null      ? $request->get('type')                    : !$failure = true;
+            $newWine['country']     = $request->get('country') != null     ? $request->get('type')                    : !$failure = true;
+            $newWine['kind']        = $request->get('kind') != null        ? $request->get('kind')                    : !$failure = true;
+            $newWine['type']        = $request->get('type') != null        ? $request->get('type')                    : !$failure = true;
+            $newWine['varietal']    = $request->get('varietal') != null    ? explode(',', $request->get('varietal'))  : !$failure = true;
+            if ($request->get('available') != null && is_bool((boolean)$request->get('available'))) {
+                $newWine['available'] = (boolean)$request->get('available');
             } else {
                 $newWine['available'] = false;
                 $failure = true;
             }
-            if ($request->request->get('vintage') != null && strlen($request->request->get('vintage')) == 4 && is_int((int)$request->request->get('vintage'))) {
-                $newWine['vintage'] = \DateTime::createFromFormat("Y", (int)$request->request->get('vintage'));
+            if ($request->get('vintage') != null && strlen($request->get('vintage')) == 4 && is_int((int)$request->get('vintage'))) {
+                $newWine['vintage'] = \DateTime::createFromFormat("Y", (int)$request->get('vintage'));
             } else {
                 $newWine['vintage'] = false;
                 $failure = true;
             }
-            if ($request->request->get('price') != null && is_float((float)$request->request->get('price'))) {
-                $newWine['price'] = $request->request->get('price');
+            if ($request->get('price') != null && is_float((float)$request->get('price'))) {
+                $newWine['price'] = $request->get('price');
             } else {
                 $newWine['price'] = false;
                 $failure = true;
             }
-            if ($request->request->get('volume') != null && is_float((float)$request->request->get('volume'))) {
-                $newWine['volume'] = $request->request->get('volume');
+            if ($request->get('volume') != null && is_float((float)$request->get('volume'))) {
+                $newWine['volume'] = $request->get('volume');
             } else {
                 $newWine['volume'] = false;
                 $failure = true;
             }
-            if ($request->request->get('zipcode') != null && is_int((int)$request->request->get('zipcode'))) {
-                $newWine['zipcode'] = $request->request->get('zipcode');
+            if ($request->get('zipcode') != null && is_int((int)$request->get('zipcode'))) {
+                $newWine['zipcode'] = $request->get('zipcode');
             } else {
                 $newWine['zipcode'] = false;
                 $failure = true;
@@ -190,8 +190,8 @@ class ApiController extends Controller
             $response->setStatusCode(Response::HTTP_BAD_REQUEST);
             $failure = false;
             //Post überprüfung
-            if ($request->request->get('wine') != null && is_array($request->request->get('wine'))) {
-                $orders = $request->request->get('wine');
+            if ($request->get('wine') != null && is_array($request->get('wine'))) {
+                $orders = $request->get('wine');
                 $newOrder['wine'] = array();
                 foreach ($orders as $order) {
                     if (!empty($order['id'])) {
@@ -218,14 +218,14 @@ class ApiController extends Controller
                 $newOrder['wine'] = false;
                 $failure = true;
             }
-            if ($request->request->get('client') != null && is_int((int)$request->request->get('client'))) {
-                $newOrder['client'] = $request->request->get('client');
+            if ($request->get('client') != null && is_int((int)$request->get('client'))) {
+                $newOrder['client'] = $request->get('client');
             } else {
                 $newOrder['client'] = false;
                 $failure = true;
             }
-            if ($request->request->get('date') != null && \DateTime::createFromFormat('Y-m-d',$request->request->get('date'))) {
-                $newOrder['date'] = \DateTime::createFromFormat("Y-m-d", $request->request->get('date'));
+            if ($request->get('date') != null && \DateTime::createFromFormat('Y-m-d',$request->get('date'))) {
+                $newOrder['date'] = \DateTime::createFromFormat("Y-m-d", $request->get('date'));
             } else {
                 $newOrder['date'] = false;
                 $failure = true;
@@ -746,14 +746,14 @@ class ApiController extends Controller
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
             /** @var Client $client */
             $client = $clientRepo->findOneBy(array('id' => $searchCriteria));
-            if ($client && $request->getMethod() == 'POST') {
-                $newClient['forename']  = $request->request->get('forename') != null    ? $request->request->get('forename')            : $client->getForename();
-                $newClient['surname']   = $request->request->get('surname') != null     ? $request->request->get('surname')             : $client->getSurname();
-                $newClient['street']    = $request->request->get('street') != null      ? $request->request->get('street')              : $client->getStreet();
-                $newClient['streetno']  = $request->request->get('streetno') != null    ? $request->request->get('streetno')            : $client->getStreetno();
-                $newClient['city']      = $request->request->get('city') != null        ? $request->request->get('city')                : $client->getCity()->getName();
-                $newClient['zipcode']   = $request->request->get('zipcode') != null     ? $request->request->get('zipcode')             : $client->getCity()->getZipcode();
-                $newClient['phone']     = $request->request->get('phone') != null       ? explode(',', $request->request->get('phone')) : $this->getClientPhoneNumbers($client);
+            if ($client ) {
+                $newClient['forename']  = $request->get('forename') != null    ? $request->get('forename')            : $client->getForename();
+                $newClient['surname']   = $request->get('surname') != null     ? $request->get('surname')             : $client->getSurname();
+                $newClient['street']    = $request->get('street') != null      ? $request->get('street')              : $client->getStreet();
+                $newClient['streetno']  = $request->get('streetno') != null    ? $request->get('streetno')            : $client->getStreetno();
+                $newClient['city']      = $request->get('city') != null        ? $request->get('city')                : $client->getCity()->getName();
+                $newClient['zipcode']   = $request->get('zipcode') != null     ? $request->get('zipcode')             : $client->getCity()->getZipcode();
+                $newClient['phone']     = $request->get('phone') != null       ? explode(',', $request->get('phone')) : $this->getClientPhoneNumbers($client);
                 $em = $this->getDoctrine()->getManager();
                 //Suchen bzw erzeugen einer Stadt für einen Kunden
                 $cityRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:City');
@@ -789,11 +789,12 @@ class ApiController extends Controller
                         $response->headers->set('Content-Type', 'application/json');
                         $response->setStatusCode(Response::HTTP_OK);
                     }
+                } else {
+                    //Ausgabe für Fehlerhaften Post
+                    $response = new Response(json_encode($newClient));
+                    $response->headers->set('Content-Type', 'application/json');
+                    $response->setStatusCode(Response::HTTP_BAD_REQUEST);
                 }
-                //Ausgabe für Fehlerhaften Post
-                $response = new Response(json_encode($newClient));
-                $response->headers->set('Content-Type', 'application/json');
-                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -826,36 +827,36 @@ class ApiController extends Controller
             $wine = $wineRepo->findOneBy(array('id' => $searchCriteria));
             if ($wine && $request->getMethod() == 'POST') {
 
-                $newWine['name']        = $request->request->get('name') != null        ? $request->request->get('name')                    : $wine->getName();
-                $newWine['vinyard']     = $request->request->get('vinyard') != null     ? $request->request->get('vinyard')                 : $wine->getVineyard()->getName();
-                $newWine['city']        = $request->request->get('city') != null        ? $request->request->get('city')                    : $wine->getVineyard()->getCity()->getName();
-                $newWine['region']      = $request->request->get('region') != null      ? $request->request->get('type')                    : $wine->getVineyard()->getRegion()->getName();
-                $newWine['country']     = $request->request->get('country') != null     ? $request->request->get('type')                    : $wine->getVineyard()->getRegion()->getCountry()->getName();
-                $newWine['kind']        = $request->request->get('kind') != null        ? $request->request->get('kind')                    : $wine->getWinekind()->getName();
-                $newWine['type']        = $request->request->get('type') != null        ? $request->request->get('type')                    : $wine->getWinetype()->getName();
-                $newWine['varietal']    = $request->request->get('varietal') != null    ? explode(',', $request->request->get('varietal'))  : $this->getWineVarietal($wine);
-                if ($request->request->get('available') != null && is_bool($request->request->get('available'))) {
-                    $newWine['available'] = $request->request->get('available');
+                $newWine['name']        = $request->get('name') != null        ? $request->get('name')                    : $wine->getName();
+                $newWine['vinyard']     = $request->get('vinyard') != null     ? $request->get('vinyard')                 : $wine->getVineyard()->getName();
+                $newWine['city']        = $request->get('city') != null        ? $request->get('city')                    : $wine->getVineyard()->getCity()->getName();
+                $newWine['region']      = $request->get('region') != null      ? $request->get('type')                    : $wine->getVineyard()->getRegion()->getName();
+                $newWine['country']     = $request->get('country') != null     ? $request->get('type')                    : $wine->getVineyard()->getRegion()->getCountry()->getName();
+                $newWine['kind']        = $request->get('kind') != null        ? $request->get('kind')                    : $wine->getWinekind()->getName();
+                $newWine['type']        = $request->get('type') != null        ? $request->get('type')                    : $wine->getWinetype()->getName();
+                $newWine['varietal']    = $request->get('varietal') != null    ? explode(',', $request->get('varietal'))  : $this->getWineVarietal($wine);
+                if ($request->get('available') != null && is_bool($request->get('available'))) {
+                    $newWine['available'] = $request->get('available');
                 } else {
                     $newWine['available'] = $wine->getAvailable();
                 }
-                if ($request->request->get('vintage') != null && strlen($request->request->get('vintage')) == 4 && is_int($request->request->get('vintage'))) {
-                    $newWine['vintage'] = \DateTime::createFromFormat("Y", $request->request->get('vintage'));
+                if ($request->get('vintage') != null && strlen($request->get('vintage')) == 4 && is_int($request->get('vintage'))) {
+                    $newWine['vintage'] = \DateTime::createFromFormat("Y", $request->get('vintage'));
                 } else {
                     $newWine['vintage'] = $wine->getVintage();
                 }
-                if ($request->request->get('price') != null && is_float($request->request->get('price'))) {
-                    $newWine['price'] = $request->request->get('price');
+                if ($request->get('price') != null && is_float($request->get('price'))) {
+                    $newWine['price'] = $request->get('price');
                 } else {
                     $newWine['price'] = $wine->getPrice();
                 }
-                if ($request->request->get('volume') != null && is_float($request->request->get('volume'))) {
-                    $newWine['volume'] = $request->request->get('volume');
+                if ($request->get('volume') != null && is_float($request->get('volume'))) {
+                    $newWine['volume'] = $request->get('volume');
                 } else {
                     $newWine['volume'] = $wine->getVolume();
                 }
-                if ($request->request->get('zipcode') != null && is_int($request->request->get('zipcode'))) {
-                    $newWine['zipcode'] = $request->request->get('zipcode');
+                if ($request->get('zipcode') != null && is_int($request->get('zipcode'))) {
+                    $newWine['zipcode'] = $request->get('zipcode');
                 } else {
                     $newWine['zipcode'] = $wine->getVineyard()->getCity()->getZipcode();
                 }
@@ -989,13 +990,13 @@ class ApiController extends Controller
                 if ($wine && $clientorder) {
                     $winetoclientorder = $winetoclientorderRepo->findOneBy(array('clientOrder' => $clientorder, 'wine' => $wine));
                     if ($winetoclientorder) {
-                        if ($request->request->get('amount') != null && is_int($request->request->get('amount'))) {
-                            $newOrder['amount'] = $request->request->get('amount');
+                        if ($request->get('amount') != null && is_int($request->get('amount'))) {
+                            $newOrder['amount'] = $request->get('amount');
                         } else {
                             $newOrder['amount'] = $winetoclientorder->getAmount();
                         }
-                        if ($request->request->get('price') != null && is_float($request->request->get('price'))) {
-                            $newOrder['price'] = $request->request->get('price');
+                        if ($request->get('price') != null && is_float($request->get('price'))) {
+                            $newOrder['price'] = $request->get('price');
                         } else {
                             $newOrder['price'] = $winetoclientorder->getPrice();
                         }
@@ -1003,14 +1004,14 @@ class ApiController extends Controller
                         $winetoclientorder->setPrice($newOrder['price']);
                     } else {
                         $failure = false;
-                        if ($request->request->get('amount') != null && is_int($request->request->get('amount'))) {
-                            $newOrder['amount'] = $request->request->get('amount');
+                        if ($request->get('amount') != null && is_int($request->get('amount'))) {
+                            $newOrder['amount'] = $request->get('amount');
                         } else {
                             $newOrder['amount'] = false;
                             $failure = true;
                         }
-                        if ($request->request->get('price') != null && is_float($request->request->get('price'))) {
-                            $newOrder['price'] = $request->request->get('price');
+                        if ($request->get('price') != null && is_float($request->get('price'))) {
+                            $newOrder['price'] = $request->get('price');
                         } else {
                             $newOrder['price'] = false;
                             $failure = true;

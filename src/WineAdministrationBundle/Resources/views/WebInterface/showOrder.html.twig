@@ -1,7 +1,31 @@
 {% extends '::base.html.twig' %}
-{% block title %}
-    Weinverwaltung
-{% endblock %}
+{% block title %}Weinverwaltung - Bestellungsverwaltung{% endblock %}
 {% block body %}
-    {% include 'WineAdministrationBundle:Default:navigation.html.twig' %}
+{% include 'WineAdministrationBundle:Default:navigation.html.twig' %}
+        <table>
+            <thead>
+            <tr>
+                <th>Vorname</th>
+                <th>Nachname</th>
+                <th>Straße</th>
+                <th>Hausnummer</th>
+                <th>PLZ</th>
+                <th>Stadt</th>
+                <th>Telefon Nummern</th>
+            </tr>
+            </thead>
+            <tbody>
+{% for order in orders %}{{ dump(order) }}
+                {#<tr>#}
+                    {#<td>{{ user.forename }}</td>#}
+                    {#<td>{{ user.surname }}</td>#}
+                    {#<td>{{ user.street }}</td>#}
+                    {#<td>{{ user.streetNo }}</td>#}
+                    {#<td>{{ user.zipCode }}</td>#}
+                    {#<td>{{ user.city }}</td>#}
+                    {#<td>{{ user.phone|join(', ') }}</td>#}
+                {#</tr>#}
+{% endfor %}
+            </tbody>
+        </table>
 {% endblock %}

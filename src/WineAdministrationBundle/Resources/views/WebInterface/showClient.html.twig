@@ -1,7 +1,39 @@
 {% extends '::base.html.twig' %}
-{% block title %}
-    Weinverwaltung
-{% endblock %}
+{% block title %}Weinverwaltung - Kundenverwaltung{% endblock %}
 {% block body %}
-    {% include 'WineAdministrationBundle:Default:navigation.html.twig' %}
+{% include 'WineAdministrationBundle:Default:navigation.html.twig' %}
+{% for user in users %}
+        <form id="user_edit_{{ user.id }}" action="{{ postUrl ~ user.id }}" method="POST">
+{% endfor %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Vorname</th>
+                    <th>Nachname</th>
+                    <th>Straße</th>
+                    <th>Hausnummer</th>
+                    <th>PLZ</th>
+                    <th>Stadt</th>
+                    <th>Telefon Nummern</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+{% for user in users %}
+                    <tr>
+                        <td><input type="text" name="forename" form="user_edit_{{ user.id }}" value="{{ user.forename }}"></td>
+                        <td><input type="text" name="surname" form="user_edit_{{ user.id }}" value="{{ user.surname }}"></td>
+                        <td><input type="text" name="street" form="user_edit_{{ user.id }}" value="{{ user.street }}"></td>
+                        <td><input type="text" name="streetno" form="user_edit_{{ user.id }}" value="{{ user.streetNo }}"></td>
+                        <td><input type="text" name="zipcode" form="user_edit_{{ user.id }}" value="{{ user.zipCode }}"></td>
+                        <td><input type="text" name="city" form="user_edit_{{ user.id }}" value="{{ user.city }}"></td>
+                        <td><input type="text" name="phone" form="user_edit_{{ user.id }}" value="{{ user.phone|join(',') }}"></td>
+                        <td><input type="submit" form="user_edit_{{ user.id }}" value=" Absenden "></td>
+                    </tr>
+{% endfor %}
+            </tbody>
+        </table>
+{% for user in users %}
+        </form>
+{% endfor %}
 {% endblock %}
