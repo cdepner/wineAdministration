@@ -1,41 +1,64 @@
 {% extends '::base.html.twig' %}
 {% block title %}Weinverwaltung - Weinverwaltung{% endblock %}
+{% block stylesheets %}
+    {% stylesheets
+    '@WineAdministrationBundle/Resources/public/css/*css'
+    combine=true %}
+    <link href="{{ asset_url }}" type="text/css" rel="stylesheet" />
+    {% endstylesheets %}
+{% endblock %}
 {% block body %}
     {% include 'WineAdministrationBundle:Default:navigation.html.twig' %}
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Rebsorten</th>
-                <th>Jahrgang</th>
-                <th>Weingut</th>
-                <th>Stadt</th>
-                <th>Region</th>
-                <th>Land</th>
-                <th>Art</th>
-                <th>Typ</th>
-                <th>Füllmenge</th>
-                <th>Preis</th>
-                <th>Verfügbar</th>
-            </tr>
-        </thead>
-        <tbody>
-{% for wine in wines %}
-            <tr>
-                <td>{{ wine.name }}</td>
-                <td>{{ wine.varietal|join(', ') }}</td>
-                <td>{{ wine.vintage }}</td>
-                <td>{{ wine.vineyard }}</td>
-                <td>{{ wine.city }}</td>
-                <td>{{ wine.region }}</td>
-                <td>{{ wine.country }}</td>
-                <td>{{ wine.kind }}</td>
-                <td>{{ wine.type }}</td>
-                <td>{{ wine.volume|number_format(2, ',', '.') }}</td>
-                <td>{{ wine.price|number_format(2, ',', '.') }} €</td>
-                <td>{{ wine.available ? 'x' : 'o' }}</td>
-            </tr>
-{% endfor %}
-        </tbody>
-    </table>
+    <div class="table">
+        <div>
+            <div>Name</div>
+            <div>Rebsorten</div>
+            <div>Jahrgang</div>
+            <div>Weingut</div>
+            <div>Stadt</div>
+            <div>PLZ</div>
+            <div>Region</div>
+            <div>Land</div>
+            <div>Art</div>
+            <div>Typ</div>
+            <div>Füllmenge</div>
+            <div>Preis</div>
+            <div>Verfügbar</div>
+        </div>
+        {% for wine in wines %}
+            <form id="wine_edit_{{ wine.id }}" action="{{ path('wineadministration_webinterface_editwine', { 'searchCriteria': wine.id }) }}" method="POST">
+                <div><input type="text" name="name" form="wine_edit_{{ wine.id }}" value="{{ wine.name }}"></div>
+                <div><input type="text" name="varietal" form="wine_edit_{{ wine.id }}" value="{{ wine.varietal|join(', ') }}"></div>
+                <div><input type="text" name="vintage" form="wine_edit_{{ wine.id }}" value="{{ wine.vintage }}"></div>
+                <div><input type="text" name="vineyard" form="wine_edit_{{ wine.id }}" value="{{ wine.vineyard }}"></div>
+                <div><input type="text" name="city" form="wine_edit_{{ wine.id }}" value="{{ wine.city }}"></div>
+                <div><input type="text" name="zipcode" form="wine_edit_{{ wine.id }}" value="{{ wine.zipcode }}"></div>
+                <div><input type="text" name="region" form="wine_edit_{{ wine.id }}" value="{{ wine.region }}"></div>
+                <div><input type="text" name="country" form="wine_edit_{{ wine.id }}" value="{{ wine.country }}"></div>
+                <div><input type="text" name="kind" form="wine_edit_{{ wine.id }}" value="{{ wine.kind }}"></div>
+                <div><input type="text" name="type" form="wine_edit_{{ wine.id }}" value="{{ wine.type }}"></div>
+                <div><input type="text" name="volume" form="wine_edit_{{ wine.id }}" value="{{ wine.volume|number_format(2, ',', '.') }}"></div>
+                <div><input type="text" name="price" form="wine_edit_{{ wine.id }}" value="{{ wine.price|number_format(2, ',', '.') }}"></div>
+                <div><input type="text" name="available" form="wine_edit_{{ wine.id }}" value="{{ wine.available ? 'x' : 'o' }}"></div>
+                <div><input type="submit" name="submit" form="wine_edit_{{ wine.id }}" value=" Bearbeiten "></div>
+                <div><input type="submit" name="delete" form="wine_edit_{{ wine.id }}" value=" Löschen "></div>
+            </form>
+        {% endfor %}
+            <form id="wine_add" action="{{ path('wineadministration_webinterface_addwine') }}" method="POST">
+                <div><input type="text" name="name" form="wine_add" value=""></div>
+                <div><input type="text" name="varietal" form="wine_add" value=""></div>
+                <div><input type="text" name="vintage" form="wine_add" value=""></div>
+                <div><input type="text" name="vineyard" form="wine_add" value=""></div>
+                <div><input type="text" name="city" form="wine_add" value=""></div>
+                <div><input type="text" name="zipcode" form="wine_add" value=""></div>
+                <div><input type="text" name="region" form="wine_add" value=""></div>
+                <div><input type="text" name="country" form="wine_add" value=""></div>
+                <div><input type="text" name="kind" form="wine_add" value=""></div>
+                <div><input type="text" name="type" form="wine_add" value=""></div>
+                <div><input type="text" name="volume" form="wine_add" value=""></div>
+                <div><input type="text" name="price" form="wine_add" value=""></div>
+                <div><input type="text" name="available" form="wine_add" value=""></div>
+                <div><input type="submit" form="wine_add" value=" Hinzufügen "></div>
+            </form>
+    </div>
 {% endblock %}

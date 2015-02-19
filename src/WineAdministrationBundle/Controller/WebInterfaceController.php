@@ -27,7 +27,6 @@ class WebInterfaceController extends Controller
     public function showWineAdministrationAction()
     {
 
-
         return array();
     }
 
@@ -50,15 +49,14 @@ class WebInterfaceController extends Controller
     {
         $addParam = '';
         if ($searchCriteria) {
-            $addParam = '/'.$searchCriteria;
+            $url = $this->generateUrl('wineadministration_api_showclient', array ('searchCriteria' => $addParam), true);
+        } else {
+            $url = $this->generateUrl('wineadministration_api_showclient', array(), true);
         }
-        $url = 'http://wine.local/weinverwaltung/api/show/client'.$addParam;
-
         $users = json_decode($this->getApiRequest($url));
 
         return array(
-            'users' => $users,
-            'postUrl' => 'http://wine.local/weinverwaltung/edit/client/'
+            'users' => $users
         );
     }
 
@@ -81,11 +79,54 @@ class WebInterfaceController extends Controller
     public function editClientAction($searchCriteria, Request $request)
     {
         //Default Response für Fehlerhaften Post
+        $response = new Response(array('Fehlerhafte Anfrage'));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $post = array();
+        if ($searchCriteria && $request->getMethod() == 'POST') {
+            if ($request->get('submit') && !$request->get('reset')) {
+                $post['forename'] = $request->get('forename');
+                $post['surname'] = $request->get('surname');
+                $post['street'] = $request->get('street');
+                $post['streetno'] = $request->get('streetno');
+                $post['city'] = $request->get('city');
+                $post['zipcode'] = $request->get('zipcode');
+                $post['phone'] = $request->get('phone');
+                $url = $this->generateUrl('wineadministration_api_editclient', array('searchCriteria' => $searchCriteria), true);
+                $users = json_decode($this->postApiRequest($url, $post));
+            } else if (!$request->get('submit') && $request->get('reset')) {
+                $url = $this->generateUrl('wineadministration_api_deleteclient', array('searchCriteria' => $searchCriteria), true);
+                $users = json_decode($this->getApiRequest($url, $post));
+            }
+            return array(
+                'users' => $users
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Webinterface User hinzufügen
+     *
+     * @param Request $request
+     *
+     * @Route(
+     *       "/weinverwaltung/add/client",
+     *       methods      = { "GET", "POST" }
+     * )
+     * @Template("WineAdministrationBundle:WebInterface:showClient.html.twig")
+     *
+     * @return array|Response
+     */
+    public function addClientAction(Request $request)
+    {
+        //Default Response für Fehlerhaften Post
         $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
         $response->headers->set('Content-Type', 'application/json');
         $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $post = array();
-        if ($searchCriteria) {
+        if ($request->getMethod() == 'POST') {
             $post['forename']  = $request->get('forename');
             $post['surname']   = $request->get('surname');
             $post['street']    = $request->get('street');
@@ -93,11 +134,10 @@ class WebInterfaceController extends Controller
             $post['city']      = $request->get('city');
             $post['zipcode']   = $request->get('zipcode');
             $post['phone']     = $request->get('phone');
-            $url = 'http://wine.local/weinverwaltung/api/edit/client/'.$searchCriteria;
+            $url = $this->generateUrl('wineadministration_api_addclient', array(), true);
             $users = json_decode($this->postApiRequest($url, $post));
             return array(
-                'users' => $users,
-                'postUrl' => 'http://wine.local/weinverwaltung/edit/client/'
+                'users' => $users
             );
         }
 
@@ -112,7 +152,7 @@ class WebInterfaceController extends Controller
      * @Route(
      *       "/weinverwaltung/wine/{searchCriteria}",
      *       defaults     = { "searchCriteria" = null },
-     *       requirements = { "searchCriteria" = "[a-zA-Z0-9_]+" },
+     *       requirements = { "searchCriteria" = "[a-zA-Z0-9]+" },
      *       methods      = { "GET" }
      * )
      * @Template()
@@ -130,9 +170,105 @@ class WebInterfaceController extends Controller
         $wines = json_decode($this->getApiRequest($url));
 
         return array(
-            'wines' => $wines,
-            'postUrl' => 'http://wine.local/weinverwaltung/edit/wine/'
+            'wines' => $wines
         );
+    }
+
+    /**
+     * Webinterface Wine editiern
+     *
+     * @param string  $searchCriteria Client ID oder Name -> Vor und Nachname werden mit _ getrennt
+     * @param Request $request
+     *
+     * @Route(
+     *       "/weinverwaltung/edit/client/{searchCriteria}",
+     *       defaults     = { "searchCriteria" = null },
+     *       requirements = { "searchCriteria" = "[a-zA-Z0-9]+" },
+     *       methods      = { "GET", "POST" }
+     * )
+     * @Template("WineAdministrationBundle:WebInterface:showClient.html.twig")
+     *
+     * @return array|Response
+     */
+    public function editWineAction($searchCriteria, Request $request)
+    {
+        //Default Response für Fehlerhaften Post
+        $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $post = array();
+        if ($request->getMethod() == 'POST') {
+            if ($request->get('submit') && !$request->get('reset')) {
+                $post['name']  = $request->get('name');
+                $post['varietal']   = $request->get('varietal');
+                $post['vintage']    = $request->get('vintage');
+                $post['vineyard']  = $request->get('vineyard');
+                $post['city']      = $request->get('city');
+                $post['zipcode']   = $request->get('zipcode');
+                $post['region']     = $request->get('region');
+                $post['country']     = $request->get('country');
+                $post['kind']     = $request->get('kind');
+                $post['type']     = $request->get('type');
+                $post['volume']     = $request->get('volume');
+                $post['price']     = $request->get('price');
+                $post['available']     = $request->get('available');
+                $url = $this->generateUrl('wineadministration_api_editwine', array('searchCriteria' => $searchCriteria), true);
+                $wines = json_decode($this->postApiRequest($url, $post));
+            } else if (!$request->get('submit') && $request->get('reset')) {
+                $url = $this->generateUrl('wineadministration_api_deletewine', array('searchCriteria' => $searchCriteria), true);
+                $wines = json_decode($this->getApiRequest($url, $post));
+            }
+
+            return array(
+                'users' => $wines
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Webinterface Wine hinzufügen
+     *
+     * @param Request $request
+     *
+     * @Route(
+     *       "/weinverwaltung/add/client",
+     *       methods      = { "GET", "POST" }
+     * )
+     * @Template("WineAdministrationBundle:WebInterface:showClient.html.twig")
+     *
+     * @return array|Response
+     */
+    public function addWineAction(Request $request)
+    {
+        //Default Response für Fehlerhaften Post
+        $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $post = array();
+        if ($request->getMethod() == 'POST') {
+            $post['name']       = $request->get('name');
+            $post['varietal']   = $request->get('varietal');
+            $post['vintage']    = $request->get('vintage');
+            $post['vineyard']   = $request->get('vineyard');
+            $post['city']       = $request->get('city');
+            $post['zipcode']    = $request->get('zipcode');
+            $post['region']     = $request->get('region');
+            $post['country']    = $request->get('country');
+            $post['kind']       = $request->get('kind');
+            $post['type']       = $request->get('type');
+            $post['volume']     = $request->get('volume');
+            $post['price']      = $request->get('price');
+            $post['available']  = $request->get('available');
+            $url = $this->generateUrl('wineadministration_api_addwine', array(), true);
+            $wines = json_decode($this->postApiRequest($url, $post));
+            return array(
+                'users' => $wines
+            );
+        }
+
+        return $response;
     }
 
     /**

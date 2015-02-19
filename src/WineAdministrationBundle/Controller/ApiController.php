@@ -609,6 +609,7 @@ class ApiController extends Controller
                     'volume'    => $wine->getVolume(),
                     'vineyard'  => $wine->getVineyard()->getName(),
                     'city'      => $wine->getVineyard()->getCity()->getName(),
+                    'zipcode'      => $wine->getVineyard()->getCity()->getZipcode(),
                     'region'    => $wine->getVineyard()->getRegion()->getName(),
                     'country'   => $wine->getVineyard()->getRegion()->getCountry()->getName(),
                     'kind'      => $wine->getWinekind()->getName(),
@@ -746,7 +747,7 @@ class ApiController extends Controller
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
             /** @var Client $client */
             $client = $clientRepo->findOneBy(array('id' => $searchCriteria));
-            if ($client ) {
+            if ($client && $request->getMethod() == 'POST') {
                 $newClient['forename']  = $request->get('forename') != null    ? $request->get('forename')            : $client->getForename();
                 $newClient['surname']   = $request->get('surname') != null     ? $request->get('surname')             : $client->getSurname();
                 $newClient['street']    = $request->get('street') != null      ? $request->get('street')              : $client->getStreet();
