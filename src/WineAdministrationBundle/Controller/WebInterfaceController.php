@@ -47,9 +47,8 @@ class WebInterfaceController extends Controller
      */
     public function showClientAction($searchCriteria)
     {
-        $addParam = '';
         if ($searchCriteria) {
-            $url = $this->generateUrl('wineadministration_api_showclient', array ('searchCriteria' => $addParam), true);
+            $url = $this->generateUrl('wineadministration_api_showclient', array ('searchCriteria' => $searchCriteria), true);
         } else {
             $url = $this->generateUrl('wineadministration_api_showclient', array(), true);
         }
@@ -57,6 +56,64 @@ class WebInterfaceController extends Controller
 
         return array(
             'users' => $users
+        );
+    }
+
+    /**
+     * Webinterface Order anzeige
+     *
+     * @param string $searchCriteria Order ID
+     *
+     * @Route(
+     *       "/weinverwaltung/order/{searchCriteria}",
+     *       defaults     = { "searchCriteria" = null },
+     *       requirements = { "searchCriteria" = "[a-zA-Z0-9_]+" },
+     *       methods      = { "GET" }
+     * )
+     * @Template()
+     *
+     * @return Response json
+     */
+    public function showOrderAction($searchCriteria)
+    {
+        if ($searchCriteria) {
+            $url = $this->generateUrl('wineadministration_api_showorder', array ('searchCriteria' => $searchCriteria), true);
+        } else {
+            $url = $this->generateUrl('wineadministration_api_showorder', array(), true);
+        }
+        $orders = json_decode($this->getApiRequest($url));
+
+        return array(
+            'orders' => $orders
+        );
+    }
+
+    /**
+     * Webinterface Wine anzeige
+     *
+     * @param string $searchCriteria Wine ID oder Name
+     *
+     * @Route(
+     *       "/weinverwaltung/wine/{searchCriteria}",
+     *       defaults     = { "searchCriteria" = null },
+     *       requirements = { "searchCriteria" = "[a-zA-Z0-9]+" },
+     *       methods      = { "GET" }
+     * )
+     * @Template()
+     *
+     * @return Response json
+     */
+    public function showWineAction($searchCriteria)
+    {
+        if ($searchCriteria) {
+            $url = $this->generateUrl('wineadministration_api_showwine', array ('searchCriteria' => $searchCriteria), true);
+        } else {
+            $url = $this->generateUrl('wineadministration_api_showwine', array(), true);
+        }
+        $wines = json_decode($this->getApiRequest($url));
+
+        return array(
+            'wines' => $wines
         );
     }
 
@@ -107,19 +164,22 @@ class WebInterfaceController extends Controller
     }
 
     /**
-     * Webinterface User hinzufügen
+     * Webinterface Order editiern
      *
+     * @param string  $searchCriteria Client ID oder Name -> Vor und Nachname werden mit _ getrennt
      * @param Request $request
      *
      * @Route(
-     *       "/weinverwaltung/add/client",
+     *       "/weinverwaltung/edit/order/{searchCriteria}",
+     *       defaults     = { "searchCriteria" = null },
+     *       requirements = { "searchCriteria" = "[a-zA-Z0-9_]+" },
      *       methods      = { "GET", "POST" }
      * )
      * @Template("WineAdministrationBundle:WebInterface:showClient.html.twig")
      *
      * @return array|Response
      */
-    public function addClientAction(Request $request)
+    public function editOrderAction($searchCriteria, Request $request)
     {
         //Default Response für Fehlerhaften Post
         $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
@@ -127,51 +187,25 @@ class WebInterfaceController extends Controller
         $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $post = array();
         if ($request->getMethod() == 'POST') {
-            $post['forename']  = $request->get('forename');
-            $post['surname']   = $request->get('surname');
-            $post['street']    = $request->get('street');
-            $post['streetno']  = $request->get('streetno');
-            $post['city']      = $request->get('city');
-            $post['zipcode']   = $request->get('zipcode');
-            $post['phone']     = $request->get('phone');
-            $url = $this->generateUrl('wineadministration_api_addclient', array(), true);
-            $users = json_decode($this->postApiRequest($url, $post));
+            if ($request->get('submit') && !$request->get('reset')) {
+                $post['wine']  = $request->get('wine');
+                $post['client']   = $request->get('client');
+                $post['amount']    = $request->get('amount');
+                $post['price']  = $request->get('price');
+                $post['date']      = $request->get('date');
+                $url = $this->generateUrl('wineadministration_api_editorder', array('searchCriteria' => $searchCriteria), true);
+                $orders = json_decode($this->postApiRequest($url, $post));
+            } else if (!$request->get('submit') && $request->get('reset')) {
+                $url = $this->generateUrl('wineadministration_api_deleteorder', array('searchCriteria' => $searchCriteria), true);
+                $orders = json_decode($this->getApiRequest($url, $post));
+            }
+
             return array(
-                'users' => $users
+                'orders' => $orders
             );
         }
 
         return $response;
-    }
-
-    /**
-     * Webinterface Wine anzeige
-     *
-     * @param string $searchCriteria Wine ID oder Name
-     *
-     * @Route(
-     *       "/weinverwaltung/wine/{searchCriteria}",
-     *       defaults     = { "searchCriteria" = null },
-     *       requirements = { "searchCriteria" = "[a-zA-Z0-9]+" },
-     *       methods      = { "GET" }
-     * )
-     * @Template()
-     *
-     * @return Response json
-     */
-    public function showWineAction($searchCriteria)
-    {
-        $addParam = '';
-        if ($searchCriteria) {
-            $addParam = '/'.$searchCriteria;
-        }
-        $url = 'http://wine.local/weinverwaltung/api/show/wine'.$addParam;
-
-        $wines = json_decode($this->getApiRequest($url));
-
-        return array(
-            'wines' => $wines
-        );
     }
 
     /**
@@ -220,7 +254,45 @@ class WebInterfaceController extends Controller
             }
 
             return array(
-                'users' => $wines
+                'wines' => $wines
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Webinterface User hinzufügen
+     *
+     * @param Request $request
+     *
+     * @Route(
+     *       "/weinverwaltung/add/client",
+     *       methods      = { "GET", "POST" }
+     * )
+     * @Template("WineAdministrationBundle:WebInterface:showClient.html.twig")
+     *
+     * @return array|Response
+     */
+    public function addClientAction(Request $request)
+    {
+        //Default Response für Fehlerhaften Post
+        $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $post = array();
+        if ($request->getMethod() == 'POST') {
+            $post['forename']  = $request->get('forename');
+            $post['surname']   = $request->get('surname');
+            $post['street']    = $request->get('street');
+            $post['streetno']  = $request->get('streetno');
+            $post['city']      = $request->get('city');
+            $post['zipcode']   = $request->get('zipcode');
+            $post['phone']     = $request->get('phone');
+            $url = $this->generateUrl('wineadministration_api_addclient', array(), true);
+            $users = json_decode($this->postApiRequest($url, $post));
+            return array(
+                'users' => $users
             );
         }
 
@@ -269,28 +341,6 @@ class WebInterfaceController extends Controller
         }
 
         return $response;
-    }
-
-    /**
-     * Webinterface Order anzeige
-     *
-     * @param string $searchCriteria Order ID
-     *
-     * @Route(
-     *       "/weinverwaltung/order/{searchCriteria}",
-     *       defaults     = { "searchCriteria" = null },
-     *       requirements = { "searchCriteria" = "[a-zA-Z0-9_]+" },
-     *       methods      = { "GET" }
-     * )
-     * @Template()
-     *
-     * @return Response json
-     */
-    public function showOrderAction($searchCriteria)
-    {
-
-
-        return array();
     }
 
     /**

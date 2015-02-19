@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use WineAdministrationBundle\Entity\City;
 use WineAdministrationBundle\Entity\Client;
+use WineAdministrationBundle\Entity\ClientorderRepository;
 use WineAdministrationBundle\Entity\Clientorder;
 use WineAdministrationBundle\Entity\ClientRepository;
 use WineAdministrationBundle\Entity\Clientphone;
@@ -553,8 +554,9 @@ class ApiController extends Controller
      */
     public function showOrderAction($searchCriteria)
     {
-        /** @var WinetoclientorderRepository $winetoclientorderRepository */
+        /** @var ClientorderRepository $clientorderRepository */
         $clientorderRepository = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientorder');
+        /** @var WinetoclientorderRepository $winetoclientorderRepository */
         $winetoclientorderRepository = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetoclientorder');
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
             $clientorder = $clientorderRepository->findBy(array('id' => $searchCriteria));
@@ -573,7 +575,7 @@ class ApiController extends Controller
         $jsonOrder = json_encode($orderSorted);
         $response = new Response($jsonOrder);
         $response->headers->set('Content-Type', 'application/json');
-        if (empty($orderArray)) {
+        if (empty($orderSorted)) {
             $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         } else {
             $response->setStatusCode(Response::HTTP_OK);
