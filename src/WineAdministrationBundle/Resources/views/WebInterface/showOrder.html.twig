@@ -1,31 +1,38 @@
 {% extends '::base.html.twig' %}
-{% block title %}Weinverwaltung - Bestellungsverwaltung{% endblock %}
+{% block title %}Weinverwaltung - Kundenverwaltung{% endblock %}
+{% block stylesheets %}
+    {% stylesheets
+    '@WineAdministrationBundle/Resources/public/css/*css'
+    combine=true %}
+    <link href="{{ asset_url }}" type="text/css" rel="stylesheet" />
+    {% endstylesheets %}
+{% endblock %}
 {% block body %}
-{% include 'WineAdministrationBundle:Default:navigation.html.twig' %}
-        <table>
-            <thead>
-            <tr>
-                <th>Vorname</th>
-                <th>Nachname</th>
-                <th>Straße</th>
-                <th>Hausnummer</th>
-                <th>PLZ</th>
-                <th>Stadt</th>
-                <th>Telefon Nummern</th>
-            </tr>
-            </thead>
-            <tbody>
-{% for order in orders %}{{ dump(order) }}
-                {#<tr>#}
-                    {#<td>{{ user.forename }}</td>#}
-                    {#<td>{{ user.surname }}</td>#}
-                    {#<td>{{ user.street }}</td>#}
-                    {#<td>{{ user.streetNo }}</td>#}
-                    {#<td>{{ user.zipCode }}</td>#}
-                    {#<td>{{ user.city }}</td>#}
-                    {#<td>{{ user.phone|join(', ') }}</td>#}
-                {#</tr>#}
+    {% include 'WineAdministrationBundle:Default:navigation.html.twig' %}
+        <div class="table">
+            <div>
+                <div>Bestellnummer ID</div>
+                <div>Kunden ID</div>
+                <div>Bestelldatum</div>
+                <div>Bestellung</div>
+            </div>
+{% for order in orders %}
+            <form id="order_edit_{{ order.id }}" action="{{ path('wineadministration_webinterface_editorder', { 'searchCriteria': order.id }) }}" method="POST">
+                <div><input type="text" name="id" form="order_edit_{{ order.id }}" value="{{ order.id }}"></div>
+                <div><input type="text" name="client" form="order_edit_{{ order.id }}" value="{{ order.client.id }}"></div>
+                <div><input type="text" name="orderdate" form="order_edit_{{ order.id }}" value="{{ order.orderDate.date|date("d.m.Y") }}"></div>
+{% set wineOrder = '' %}{% for wine in order.clientOrder %}{% set wineOrder = wineOrder ~ [wine.amount, wine.price, wine.wine.id]|join(',') ~ ';' %}{% endfor %}
+                <div><input type="text" name="wine" form="order_edit_{{ order.id }}" value="{{ wineOrder }}"></div>
+                <div><input type="submit" name="submit" form="order_edit_{{ order.id }}" value=" Bearbeiten "></div>
+                <div><input type="submit" name="delete" form="order_edit_{{ order.id }}" value=" Löschen "></div>
+            </form>
 {% endfor %}
-            </tbody>
-        </table>
+            <form id="order_add" action="{{ path('wineadministration_webinterface_addorder') }}" method="POST">
+                <div></div>
+                <div><input type="text" name="client" form="order_add" value=""></div>
+                <div><input type="text" name="orderdate" form="order_add" value=""></div>
+                <div><input type="text" name="wine" form="order_add" value=""></div>
+                <div><input type="submit" name="submit" form="order_add" value=" Hinzufügen "></div>
+            </form>
+        </div>
 {% endblock %}

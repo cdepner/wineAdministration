@@ -35,7 +35,7 @@ class ApiController extends Controller
      *
      * @Route(
      *       "/weinverwaltung/api/add/client",
-     *       methods = { "GET", "POST" }
+     *       methods = { "GET", "POST", "PUT" }
      * )
      *
      * @return Response json
@@ -46,22 +46,9 @@ class ApiController extends Controller
             //Default Response für Fehlerhaften Post
             $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
             $response->headers->set('Content-Type', 'application/json');
-            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
-            $failure = false;
-            //Post überprüfung
-            $newClient['forename']  = $request->get('forename') != null    ? $request->get('forename')            : !$failure = true;
-            $newClient['surname']   = $request->get('surname') != null     ? $request->get('surname')             : !$failure = true;
-            $newClient['street']    = $request->get('street') != null      ? $request->get('street')              : !$failure = true;
-            $newClient['streetno']  = $request->get('streetno') != null    ? $request->get('streetno')            : !$failure = true;
-            $newClient['city']      = $request->get('city') != null        ? $request->get('city')                : !$failure = true;
-            $newClient['phone']     = $request->get('phone') != null       ? explode(',', $request->get('phone')) : !$failure = true;
-            if ($request->get('zipcode') != null && is_int((int)$request->get('zipcode'))) {
-                $newClient['zipcode'] = $request->get('zipcode');
-            } else {
-                $newClient['zipcode'] = false;
-                $failure = true;
-            }
-            if (!$failure) {
+            $response->setStatusCode(Response::HTTP_NOT_FOUND);
+            $newClient = $this->validationClientAddPost($request);
+            if (!$newClient['failure']) {
                 //Kunde in die Datenbank schreiben
                 $client = $this->addClient($newClient);
                 if ($client != null) {
@@ -70,7 +57,7 @@ class ApiController extends Controller
                     if (!empty($usersArray)) {
                         $response = new Response(json_encode($usersArray));
                         $response->headers->set('Content-Type', 'application/json');
-                        $response->setStatusCode(Response::HTTP_OK);
+                        $response->setStatusCode(Response::HTTP_CREATED);
                     }
                 }
             } else {
@@ -93,7 +80,7 @@ class ApiController extends Controller
      *
      * @Route(
      *       "/weinverwaltung/api/add/wine",
-     *       methods = { "GET", "POST" }
+     *       methods = { "GET", "POST", "PUT" }
      * )
      *
      * @return Response json
@@ -104,48 +91,9 @@ class ApiController extends Controller
             //Default Response für Fehlerhaften Post
             $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
             $response->headers->set('Content-Type', 'application/json');
-            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
-            $failure = false;
-            //Post überprüfung
-            $newWine['name']        = $request->get('name') != null        ? $request->get('name')                    : !$failure = true;
-            $newWine['vinyard']     = $request->get('vinyard') != null     ? $request->get('vinyard')                 : !$failure = true;
-            $newWine['city']        = $request->get('city') != null        ? $request->get('city')                    : !$failure = true;
-            $newWine['region']      = $request->get('region') != null      ? $request->get('type')                    : !$failure = true;
-            $newWine['country']     = $request->get('country') != null     ? $request->get('type')                    : !$failure = true;
-            $newWine['kind']        = $request->get('kind') != null        ? $request->get('kind')                    : !$failure = true;
-            $newWine['type']        = $request->get('type') != null        ? $request->get('type')                    : !$failure = true;
-            $newWine['varietal']    = $request->get('varietal') != null    ? explode(',', $request->get('varietal'))  : !$failure = true;
-            if ($request->get('available') != null && is_bool((boolean)$request->get('available'))) {
-                $newWine['available'] = (boolean)$request->get('available');
-            } else {
-                $newWine['available'] = false;
-                $failure = true;
-            }
-            if ($request->get('vintage') != null && strlen($request->get('vintage')) == 4 && is_int((int)$request->get('vintage'))) {
-                $newWine['vintage'] = \DateTime::createFromFormat("Y", (int)$request->get('vintage'));
-            } else {
-                $newWine['vintage'] = false;
-                $failure = true;
-            }
-            if ($request->get('price') != null && is_float((float)$request->get('price'))) {
-                $newWine['price'] = $request->get('price');
-            } else {
-                $newWine['price'] = false;
-                $failure = true;
-            }
-            if ($request->get('volume') != null && is_float((float)$request->get('volume'))) {
-                $newWine['volume'] = $request->get('volume');
-            } else {
-                $newWine['volume'] = false;
-                $failure = true;
-            }
-            if ($request->get('zipcode') != null && is_int((int)$request->get('zipcode'))) {
-                $newWine['zipcode'] = $request->get('zipcode');
-            } else {
-                $newWine['zipcode'] = false;
-                $failure = true;
-            }
-            if (!$failure) {
+            $response->setStatusCode(Response::HTTP_NOT_FOUND);
+            $newWine = $this->validationWineAddPost($request);
+            if (!$newWine['failure']) {
                 //Wein in die Datenbank schreiben
                 $wine = $this->addWine($newWine);
                 if ($wine != null) {
@@ -154,7 +102,7 @@ class ApiController extends Controller
                     if (!empty($wineArray)) {
                         $response = new Response(json_encode($wineArray));
                         $response->headers->set('Content-Type', 'application/json');
-                        $response->setStatusCode(Response::HTTP_OK);
+                        $response->setStatusCode(Response::HTTP_CREATED);
                     }
                 }
             } else {
@@ -177,7 +125,7 @@ class ApiController extends Controller
      *
      * @Route(
      *       "/weinverwaltung/api/add/order",
-     *       methods = { "GET", "POST" }
+     *       methods = { "GET", "POST", "PUT" }
      * )
      *
      * @return Response json
@@ -188,50 +136,9 @@ class ApiController extends Controller
             //Default Response für Fehlerhaften Post
             $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
             $response->headers->set('Content-Type', 'application/json');
-            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
-            $failure = false;
-            //Post überprüfung
-            if ($request->get('wine') != null && is_array($request->get('wine'))) {
-                $orders = $request->get('wine');
-                $newOrder['wine'] = array();
-                foreach ($orders as $order) {
-                    if (!empty($order['id'])) {
-                        $wine['id'] = $order['id'];
-                    } else {
-                        $wine['id'] = false;
-                        $failure = true;
-                    }
-                    if (!empty($order['amount'])) {
-                        $wine['amount'] = $order['amount'];
-                    } else {
-                        $wine['amount'] = false;
-                        $failure = true;
-                    }
-                    if (!empty($order['price'])) {
-                        $wine['price'] = $order['price'];
-                    } else {
-                        $wine['price'] = false;
-                        $failure = true;
-                    }
-                    $newOrder['wine'][] = $wine;
-                }
-            } else {
-                $newOrder['wine'] = false;
-                $failure = true;
-            }
-            if ($request->get('client') != null && is_int((int)$request->get('client'))) {
-                $newOrder['client'] = $request->get('client');
-            } else {
-                $newOrder['client'] = false;
-                $failure = true;
-            }
-            if ($request->get('date') != null && \DateTime::createFromFormat('Y-m-d',$request->get('date'))) {
-                $newOrder['date'] = \DateTime::createFromFormat("Y-m-d", $request->get('date'));
-            } else {
-                $newOrder['date'] = false;
-                $failure = true;
-            }
-            if (!$failure) {
+            $response->setStatusCode(Response::HTTP_NOT_FOUND);
+            $newOrder = $this->validationOrderAddPost($request);
+            if (!$newOrder['failure']) {
                 //Wein in die Datenbank schreiben
                 $order = $this->addOrder($newOrder);
                 if ($order != null) {
@@ -240,7 +147,7 @@ class ApiController extends Controller
                     if (!empty($orderArray)) {
                         $response = new Response(json_encode($orderArray));
                         $response->headers->set('Content-Type', 'application/json');
-                        $response->setStatusCode(Response::HTTP_OK);
+                        $response->setStatusCode(Response::HTTP_CREATED);
                     }
                 }
             } else {
@@ -254,6 +161,141 @@ class ApiController extends Controller
         }
 
         return $this->redirect($this->generateUrl('wineadministration_api_showorder', array('searchCriteria' => null)));
+    }
+
+    /**
+     * Funktion zum Validieren eines POST für einen Kunden
+     *
+     * @param Request $request
+     *
+     * @return array
+     */
+    private function validationClientAddPost(Request $request)
+    {
+        $newClient['failure'] = false;
+        $newClient['forename']  = $request->get('forename') != null    ? $request->get('forename')            : !$newClient['failure'] = true;
+        $newClient['surname']   = $request->get('surname') != null     ? $request->get('surname')             : !$newClient['failure'] = true;
+        $newClient['street']    = $request->get('street') != null      ? $request->get('street')              : !$newClient['failure'] = true;
+        $newClient['streetno']  = $request->get('streetno') != null    ? $request->get('streetno')            : !$newClient['failure'] = true;
+        $newClient['city']      = $request->get('city') != null        ? $request->get('city')                : !$newClient['failure'] = true;
+        $newClient['phone']     = $request->get('phone') != null       ? explode(',', $request->get('phone')) : !$newClient['failure'] = true;
+        if ($request->get('zipcode') != null && is_int((int)$request->get('zipcode'))) {
+            $newClient['zipcode'] = $request->get('zipcode');
+        } else {
+            $newClient['zipcode'] = false;
+            $newClient['failure'] = true;
+        }
+
+        return $newClient;
+    }
+
+    /**
+     * Funktion zum Validieren eines POST für einen Weines
+     *
+     * @param Request $request
+     *
+     * @return array
+     */
+    private function validationWineAddPost(Request $request)
+    {
+
+        $newWine['failure'] = false;
+        //Post überprüfung
+        $newWine['name']        = $request->get('name') != null        ? $request->get('name')                    : !$newWine['failure'] = true;
+        $newWine['vinyard']     = $request->get('vinyard') != null     ? $request->get('vinyard')                 : !$newWine['failure'] = true;
+        $newWine['city']        = $request->get('city') != null        ? $request->get('city')                    : !$newWine['failure'] = true;
+        $newWine['region']      = $request->get('region') != null      ? $request->get('type')                    : !$newWine['failure'] = true;
+        $newWine['country']     = $request->get('country') != null     ? $request->get('type')                    : !$newWine['failure'] = true;
+        $newWine['kind']        = $request->get('kind') != null        ? $request->get('kind')                    : !$newWine['failure'] = true;
+        $newWine['type']        = $request->get('type') != null        ? $request->get('type')                    : !$newWine['failure'] = true;
+        $newWine['varietal']    = $request->get('varietal') != null    ? explode(',', $request->get('varietal'))  : !$newWine['failure'] = true;
+        if ($request->get('available') != null && is_bool((boolean)$request->get('available'))) {
+            $newWine['available'] = (boolean)$request->get('available');
+        } else {
+            $newWine['available'] = false;
+            $newWine['failure'] = true;
+        }
+        if ($request->get('vintage') != null && strlen($request->get('vintage')) == 4 && is_int((int)$request->get('vintage'))) {
+            $newWine['vintage'] = \DateTime::createFromFormat("Y", (int)$request->get('vintage'));
+        } else {
+            $newWine['vintage'] = false;
+            $newWine['failure'] = true;
+        }
+        if ($request->get('price') != null && is_float((float)$request->get('price'))) {
+            $newWine['price'] = $request->get('price');
+        } else {
+            $newWine['price'] = false;
+            $newWine['failure'] = true;
+        }
+        if ($request->get('volume') != null && is_float((float)$request->get('volume'))) {
+            $newWine['volume'] = $request->get('volume');
+        } else {
+            $newWine['volume'] = false;
+            $newWine['failure'] = true;
+        }
+        if ($request->get('zipcode') != null && is_int((int)$request->get('zipcode'))) {
+            $newWine['zipcode'] = $request->get('zipcode');
+        } else {
+            $newWine['zipcode'] = false;
+            $newWine['failure'] = true;
+        }
+
+        return $newWine;
+    }
+
+    /**
+     * Funktion zum Validieren eines POST für einer Bestellung
+     *
+     * @param Request $request
+     *
+     * @return array
+     */
+    private function validationOrderAddPost(Request $request)
+    {
+        $newOrder['failure'] = false;
+        //Post überprüfung
+        if ($request->get('wine') != null && is_array($request->get('wine'))) {
+            $orders = $request->get('wine');
+            $newOrder['wine'] = array();
+            foreach ($orders as $order) {
+                if (!empty($order['id'])) {
+                    $wine['id'] = $order['id'];
+                } else {
+                    $wine['id'] = false;
+                    $newOrder['failure'] = true;
+                }
+                if (!empty($order['amount'])) {
+                    $wine['amount'] = $order['amount'];
+                } else {
+                    $wine['amount'] = false;
+                    $newOrder['failure'] = true;
+                }
+                if (!empty($order['price'])) {
+                    $wine['price'] = $order['price'];
+                } else {
+                    $wine['price'] = false;
+                    $newOrder['failure'] = true;
+                }
+                $newOrder['wine'][] = $wine;
+            }
+        } else {
+            $newOrder['wine'] = false;
+            $newOrder['failure'] = true;
+        }
+        if ($request->get('client') != null && is_int((int)$request->get('client'))) {
+            $newOrder['client'] = $request->get('client');
+        } else {
+            $newOrder['client'] = false;
+            $newOrder['failure'] = true;
+        }
+        if ($request->get('date') != null && \DateTime::createFromFormat('Y-m-d',$request->get('date'))) {
+            $newOrder['date'] = \DateTime::createFromFormat("Y-m-d", $request->get('date'));
+        } else {
+            $newOrder['date'] = false;
+            $newOrder['failure'] = true;
+        }
+
+        return $newOrder;
     }
 
     /**
@@ -488,7 +530,7 @@ class ApiController extends Controller
         if (empty($usersArray)) {
             $response = new Response(json_encode(array('error' => 'Fehlerhafte Kunden ID')));
             $response->headers->set('Content-Type', 'application/json');
-            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+            $response->setStatusCode(Response::HTTP_NOT_FOUND);
         } else {
             $response = new Response(json_encode($usersArray));
             $response->headers->set('Content-Type', 'application/json');
@@ -527,7 +569,7 @@ class ApiController extends Controller
         if (empty($winesArray)) {
             $response = new Response(json_encode(array('error' => 'Fehlerhafte Wein ID')));
             $response->headers->set('Content-Type', 'application/json');
-            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+            $response->setStatusCode(Response::HTTP_NOT_FOUND);
         } else {
             $response = new Response(json_encode($winesArray));
             $response->headers->set('Content-Type', 'application/json');
@@ -576,7 +618,7 @@ class ApiController extends Controller
         $response = new Response($jsonOrder);
         $response->headers->set('Content-Type', 'application/json');
         if (empty($orderSorted)) {
-            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+            $response->setStatusCode(Response::HTTP_NOT_FOUND);
         } else {
             $response->setStatusCode(Response::HTTP_OK);
         }
@@ -704,7 +746,6 @@ class ApiController extends Controller
      * @return array
      */
     private function getWineorderArray($orderObj) {
-        $orderArray = array();
         $wineArray = array();
         if ($orderObj) {
             if (!is_array($orderObj)) {
@@ -734,7 +775,7 @@ class ApiController extends Controller
      * @Route(
      *       "/weinverwaltung/api/edit/client/{searchCriteria}",
      *       requirements = { "searchCriteria" = "[0-9]+" },
-     *       methods      = { "GET", "POST" }
+     *       methods      = { "GET", "POST", "PUT" }
      * )
      *
      * @return Response json
@@ -742,61 +783,22 @@ class ApiController extends Controller
     public function editClientAction($searchCriteria, Request $request)
     {
         //Default Response für Fehlerhaften Post
-        $response = new Response(json_encode(array('error' => 'Fehlerhafte ID')));
+        $response = new Response(json_encode(array('error' => 'Fehlerhafte Anfrage')));
         $response->headers->set('Content-Type', 'application/json');
-        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
         $clientRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Client');
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
             /** @var Client $client */
             $client = $clientRepo->findOneBy(array('id' => $searchCriteria));
             if ($client && $request->getMethod() == 'POST') {
-                $newClient['forename']  = $request->get('forename') != null    ? $request->get('forename')            : $client->getForename();
-                $newClient['surname']   = $request->get('surname') != null     ? $request->get('surname')             : $client->getSurname();
-                $newClient['street']    = $request->get('street') != null      ? $request->get('street')              : $client->getStreet();
-                $newClient['streetno']  = $request->get('streetno') != null    ? $request->get('streetno')            : $client->getStreetno();
-                $newClient['city']      = $request->get('city') != null        ? $request->get('city')                : $client->getCity()->getName();
-                $newClient['zipcode']   = $request->get('zipcode') != null     ? $request->get('zipcode')             : $client->getCity()->getZipcode();
-                $newClient['phone']     = $request->get('phone') != null       ? explode(',', $request->get('phone')) : $this->getClientPhoneNumbers($client);
-                $em = $this->getDoctrine()->getManager();
-                //Suchen bzw erzeugen einer Stadt für einen Kunden
-                $cityRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:City');
-                $city = $cityRepo->findOneBy(array('name' => $newClient['city'], 'zipcode' => $newClient['zipcode']));
-                if (!$city) {
-                    $city = new City($newClient['city'], $newClient['zipcode']);
-                    $em->persist($client);
-                    $em->flush();
-                }
-                if ($city) {
-                    //Editieren des Kunden
-                    $client->setForename($newClient['forename']);
-                    $client->setSurname($newClient['surname']);
-                    $client->setStreet($newClient['street']);
-                    $client->setStreetno($newClient['streetno']);
-                    $client->setCity($city);
-                    $em->persist($client);
-                    $em->flush();
-                    //Suchen bzw erzeugen von Telefonnummern für einen Kunden
-                    $clientphoneRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientphone');
-                    foreach ($newClient['phone'] as $phone) {
-                        $clientphone = $clientphoneRepo->findOneBy(array('number' => $phone, 'client' => $client));
-                        if (!$clientphone) {
-                            $clientphone = new Clientphone($phone, $client);
-                            $em->persist($clientphone);
-                            $em->flush();
-                        }
-                    }
-                    //Wein für JSON Ausgabe vorbereiten
-                    $clientArray = $this->getClientArray($client);
-                    if (!empty($clientArray)) {
-                        $response = new Response(json_encode($clientArray));
-                        $response->headers->set('Content-Type', 'application/json');
-                        $response->setStatusCode(Response::HTTP_OK);
-                    }
-                } else {
-                    //Ausgabe für Fehlerhaften Post
-                    $response = new Response(json_encode($newClient));
+                $newClient = $this->validationClientEditPost($request, $client);
+                $editClient = $this->editClient($client, $newClient);
+                //Wein für JSON Ausgabe vorbereiten
+                $clientArray = $this->getClientArray($editClient);
+                if (!empty($clientArray)) {
+                    $response = new Response(json_encode($clientArray));
                     $response->headers->set('Content-Type', 'application/json');
-                    $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+                    $response->setStatusCode(Response::HTTP_OK);
                 }
             }
         }
@@ -813,7 +815,7 @@ class ApiController extends Controller
      * @Route(
      *       "/weinverwaltung/api/edit/wine/{searchCriteria}",
      *       requirements = { "searchCriteria" = "[0-9]+" },
-     *       methods      = { "GET", "POST" }
+     *       methods      = { "GET", "POST", "PUT" }
      * )
      *
      * @return Response json
@@ -821,135 +823,23 @@ class ApiController extends Controller
     public function editWineAction($searchCriteria, Request $request)
     {
         //Default Response für Fehlerhaften Post
-        $response = new Response(json_encode(array('error' => 'Fehlerhafte ID')));
+        $response = new Response(json_encode(array('error' => 'Fehlerhafte Anfrage')));
         $response->headers->set('Content-Type', 'application/json');
-        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
         $wineRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Wine');
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
             /** @var Wine $wine */
             $wine = $wineRepo->findOneBy(array('id' => $searchCriteria));
             if ($wine && $request->getMethod() == 'POST') {
-
-                $newWine['name']        = $request->get('name') != null        ? $request->get('name')                    : $wine->getName();
-                $newWine['vinyard']     = $request->get('vinyard') != null     ? $request->get('vinyard')                 : $wine->getVineyard()->getName();
-                $newWine['city']        = $request->get('city') != null        ? $request->get('city')                    : $wine->getVineyard()->getCity()->getName();
-                $newWine['region']      = $request->get('region') != null      ? $request->get('type')                    : $wine->getVineyard()->getRegion()->getName();
-                $newWine['country']     = $request->get('country') != null     ? $request->get('type')                    : $wine->getVineyard()->getRegion()->getCountry()->getName();
-                $newWine['kind']        = $request->get('kind') != null        ? $request->get('kind')                    : $wine->getWinekind()->getName();
-                $newWine['type']        = $request->get('type') != null        ? $request->get('type')                    : $wine->getWinetype()->getName();
-                $newWine['varietal']    = $request->get('varietal') != null    ? explode(',', $request->get('varietal'))  : $this->getWineVarietal($wine);
-                if ($request->get('available') != null && is_bool($request->get('available'))) {
-                    $newWine['available'] = $request->get('available');
-                } else {
-                    $newWine['available'] = $wine->getAvailable();
+                $newWine = $this->validationWineEditPost($request, $wine);
+                $editWine = $this->editWine($wine, $newWine);
+                //Wein für JSON Ausgabe vorbereiten
+                $wineArray = $this->getWineArray($editWine);
+                if (!empty($wineArray)) {
+                    $response = new Response(json_encode($wineArray));
+                    $response->headers->set('Content-Type', 'application/json');
+                    $response->setStatusCode(Response::HTTP_OK);
                 }
-                if ($request->get('vintage') != null && strlen($request->get('vintage')) == 4 && is_int($request->get('vintage'))) {
-                    $newWine['vintage'] = \DateTime::createFromFormat("Y", $request->get('vintage'));
-                } else {
-                    $newWine['vintage'] = $wine->getVintage();
-                }
-                if ($request->get('price') != null && is_float($request->get('price'))) {
-                    $newWine['price'] = $request->get('price');
-                } else {
-                    $newWine['price'] = $wine->getPrice();
-                }
-                if ($request->get('volume') != null && is_float($request->get('volume'))) {
-                    $newWine['volume'] = $request->get('volume');
-                } else {
-                    $newWine['volume'] = $wine->getVolume();
-                }
-                if ($request->get('zipcode') != null && is_int($request->get('zipcode'))) {
-                    $newWine['zipcode'] = $request->get('zipcode');
-                } else {
-                    $newWine['zipcode'] = $wine->getVineyard()->getCity()->getZipcode();
-                }
-
-                $em = $this->getDoctrine()->getManager();
-                $cityRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:City');
-                $city = $cityRepo->findOneBy(array('name' => $newWine['city'], 'zipcode' => $newWine['zipcode']));
-                if (!$city) {
-                    $city = new City($newWine['city'], $newWine['zipcode']);
-                    $em->persist($city);
-                    $em->flush();
-                }
-                $countryRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Country');
-                $country = $countryRepo->findOneBy(array('name' => $newWine['country']));
-                if (!$country) {
-                    $country = new Country($newWine['country']);
-                    $em->persist($country);
-                    $em->flush();
-                }
-                if ($country) {
-                    $regionRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Region');
-                    $region = $regionRepo->findOneBy(array('name' => $newWine['region']));
-                    if (!$region) {
-                        $region = new Region($newWine['region'], $country);
-                        $em->persist($region);
-                        $em->flush();
-                    }
-                    if ($city && $region) {
-                        $vineyardRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Vineyard');
-                        $vineyard = $vineyardRepo->findOneBy(array('name' => $newWine['vinyard'], 'region' => $region, 'city' => $city));
-                        if (!$vineyard) {
-                            $vineyard = new Vineyard($newWine['vineyard'], $city, $region);
-                            $em->persist($vineyard);
-                            $em->flush();
-                        }
-                        $winekindRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winekind');
-                        $winekind = $winekindRepo->findOneBy(array('name' => $newWine['kind']));
-                        if (!$winekind) {
-                            $winekind = new Winekind($newWine['kind']);
-                            $em->persist($winekind);
-                            $em->flush();
-                        }
-                        $winetypeRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetype');
-                        $winetype = $winetypeRepo->findOneBy(array('name' => $newWine['type']));
-                        if (!$winetype) {
-                            $winetype = new Winetype($newWine['type']);
-                            $em->persist($winetype);
-                            $em->flush();
-                        }
-                        if ($vineyard && $winekind && $winetype) {
-                            $wine->setAvailable($newWine['available']);
-                            $wine->setPrice($newWine['price']);
-                            $wine->setName($newWine['name']);
-                            $wine->setVintage($newWine['vintage']);
-                            $wine->setVolume($newWine['volume']);
-                            $wine->setVineyard($vineyard);
-                            $wine->setWinetype($winetype);
-                            $wine->setWinekind($winekind);
-                            $em->persist($wine);
-                            $em->flush();
-                            $winevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winevarietal');
-                            $winetowinevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetowinevarietal');
-                            foreach ($newWine['varietal'] as $varietal) {
-                                $winevarietal = $winevarietalRepo->findOneBy(array('name' => $varietal));
-                                if (!$winevarietal) {
-                                    $winevarietal = new Winevarietal($varietal);
-                                    $em->persist($winevarietal);
-                                    $em->flush();
-                                }
-                                $winetowinevarietal = $winetowinevarietalRepo->findOneBy(array('wine' => $wine, 'winevarietal' => $varietal));
-                                if ($winetowinevarietal) {
-                                    $winetowinevarietal = new Winetowinevarietal($wine, $varietal);
-                                    $em->persist($winetowinevarietal);
-                                    $em->flush();
-                                }
-                            }
-                            //Wein für JSON Ausgabe vorbereiten
-                            $wineArray = $this->getWineArray($wine);
-                            if (!empty($wineArray)) {
-                                $response = new Response(json_encode($wineArray));
-                                $response->headers->set('Content-Type', 'application/json');
-                                $response->setStatusCode(Response::HTTP_OK);
-                            }
-                        }
-                    }
-                }
-                //Ausgabe für Fehlerhaften Post
-                $response = new Response(json_encode($newWine));
-                $response->headers->set('Content-Type', 'application/json');
-                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -960,89 +850,343 @@ class ApiController extends Controller
      * Api Order editieren
      *
      * @param string  $orderId Order ID
-     * @param string  $wineId Wine ID
      * @param Request $request
      *
      * @Route(
-     *       "/weinverwaltung/api/edit/order/{orderId}/wine/{wineId}",
-     *       defaults     = {
-     *          "wineId"  = null
-     *       },
-     *       requirements = {
-     *          "orderId" = "[0-9]+",
-     *          "wineId"  = "[0-9]+"
-     *       },
-     *       methods      = { "GET", "POST" }
+     *       "/weinverwaltung/api/edit/order/{orderId}",
+     *       requirements = {"orderId" = "[0-9]+"},
+     *       methods      = { "GET", "POST", "PUT" }
      * )
      *
      * @return Response json
      */
-    public function editOrderAction($orderId, $wineId, Request $request)
+    public function editOrderAction($orderId, Request $request)
     {
         //Default Response für Fehlerhaften Post
-        $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
+        $response = new Response(json_encode(array('error' => 'Fehlerhafte Anfrage')));
         $response->headers->set('Content-Type', 'application/json');
-        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
         $clientorderRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientorder');
-        $wineRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Wine');
         $winetoclientorderRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetoclientorder');
         if ($orderId != null && is_numeric($orderId)) {
             $clientorder = $clientorderRepo->findOneBy(array('id' => $orderId));
-            if ($wineId != null && is_numeric($wineId)) {
-                $wine = $wineRepo->findOneBy(array('id' => $wineId));
-                if ($wine && $clientorder) {
-                    $winetoclientorder = $winetoclientorderRepo->findOneBy(array('clientOrder' => $clientorder, 'wine' => $wine));
-                    if ($winetoclientorder) {
-                        if ($request->get('amount') != null && is_int($request->get('amount'))) {
-                            $newOrder['amount'] = $request->get('amount');
-                        } else {
-                            $newOrder['amount'] = $winetoclientorder->getAmount();
-                        }
-                        if ($request->get('price') != null && is_float($request->get('price'))) {
-                            $newOrder['price'] = $request->get('price');
-                        } else {
-                            $newOrder['price'] = $winetoclientorder->getPrice();
-                        }
-                        $winetoclientorder->setAmount($newOrder['amount']);
-                        $winetoclientorder->setPrice($newOrder['price']);
-                    } else {
-                        $failure = false;
-                        if ($request->get('amount') != null && is_int($request->get('amount'))) {
-                            $newOrder['amount'] = $request->get('amount');
-                        } else {
-                            $newOrder['amount'] = false;
-                            $failure = true;
-                        }
-                        if ($request->get('price') != null && is_float($request->get('price'))) {
-                            $newOrder['price'] = $request->get('price');
-                        } else {
-                            $newOrder['price'] = false;
-                            $failure = true;
-                        }
-                        if (!$failure) {
-                            $winetoclientorder = new Winetoclientorder($newOrder['amount'], $newOrder['price'], $clientorder, $wine);
-                            $em = $this->getDoctrine()->getManager();
-                            $em->persist($winetoclientorder);
+            $winetoclientorder = $winetoclientorderRepo->findBy(array('clientOrder' => $clientorder));
+            $newOrder = $this->validationClientOrderPost($request, $clientorder, $winetoclientorder);
+            $editedOrder = $this->editOrder($newOrder, $clientorder, $winetoclientorder);
+            if (!empty($editedOrder)) {
+                $response = new Response(json_encode($editedOrder));
+                $response->headers->set('Content-Type', 'application/json');
+                $response->setStatusCode(Response::HTTP_OK);
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Funktion zum Validieren eines POST für einen Kunden
+     *
+     * @param Request $request
+     * @param Client  $client
+     *
+     * @return array
+     */
+    private function validationClientEditPost(Request $request, Client $client)
+    {
+        $newClient['forename']  = $request->get('forename') != null    ? $request->get('forename')            : $client->getForename();
+        $newClient['surname']   = $request->get('surname') != null     ? $request->get('surname')             : $client->getSurname();
+        $newClient['street']    = $request->get('street') != null      ? $request->get('street')              : $client->getStreet();
+        $newClient['streetno']  = $request->get('streetno') != null    ? $request->get('streetno')            : $client->getStreetno();
+        $newClient['city']      = $request->get('city') != null        ? $request->get('city')                : $client->getCity()->getName();
+        $newClient['zipcode']   = $request->get('zipcode') != null     ? $request->get('zipcode')             : $client->getCity()->getZipcode();
+        $newClient['phone']     = $request->get('phone') != null       ? explode(',', $request->get('phone')) : $this->getClientPhoneNumbers($client);
+        if ($request->get('zipcode') != null && is_int((int)$request->get('zipcode'))) {
+            $newClient['zipcode'] = $request->get('zipcode');
+        } else {
+            $newClient['zipcode'] = $client->getCity()->getZipcode();
+        }
+
+        return $newClient;
+    }
+
+    /**
+     * Funktion zum Validieren eines POST für eines Weines
+     *
+     * @param Request $request
+     * @param Wine    $wine
+     *
+     * @return array
+     */
+    private function validationWineEditPost(Request $request, Wine $wine)
+    {
+        $newWine['name']        = $request->get('name') != null        ? $request->get('name')                    : $wine->getName();
+        $newWine['vinyard']     = $request->get('vinyard') != null     ? $request->get('vinyard')                 : $wine->getVineyard()->getName();
+        $newWine['city']        = $request->get('city') != null        ? $request->get('city')                    : $wine->getVineyard()->getCity()->getName();
+        $newWine['region']      = $request->get('region') != null      ? $request->get('type')                    : $wine->getVineyard()->getRegion()->getName();
+        $newWine['country']     = $request->get('country') != null     ? $request->get('type')                    : $wine->getVineyard()->getRegion()->getCountry()->getName();
+        $newWine['kind']        = $request->get('kind') != null        ? $request->get('kind')                    : $wine->getWinekind()->getName();
+        $newWine['type']        = $request->get('type') != null        ? $request->get('type')                    : $wine->getWinetype()->getName();
+        $newWine['varietal']    = $request->get('varietal') != null    ? explode(',', $request->get('varietal'))  : $this->getWineVarietal($wine);
+        if ($request->get('available') != null && is_bool($request->get('available'))) {
+            $newWine['available'] = $request->get('available');
+        } else {
+            $newWine['available'] = $wine->getAvailable();
+        }
+        if ($request->get('vintage') != null && strlen($request->get('vintage')) == 4 && is_int((int)$request->get('vintage'))) {
+            $newWine['vintage'] = \DateTime::createFromFormat("Y", $request->get('vintage'));
+        } else {
+            $newWine['vintage'] = $wine->getVintage();
+        }
+        if ($request->get('price') != null && is_float((float)$request->get('price'))) {
+            $newWine['price'] = $request->get('price');
+        } else {
+            $newWine['price'] = $wine->getPrice();
+        }
+        if ($request->get('volume') != null && is_float((float)$request->get('volume'))) {
+            $newWine['volume'] = $request->get('volume');
+        } else {
+            $newWine['volume'] = $wine->getVolume();
+        }
+        if ($request->get('zipcode') != null && is_int((int)$request->get('zipcode'))) {
+            $newWine['zipcode'] = $request->get('zipcode');
+        } else {
+            $newWine['zipcode'] = $wine->getVineyard()->getCity()->getZipcode();
+        }
+
+        return $newWine;
+    }
+
+    /**
+     * Funktion zum Validieren eines POST für einen Kunden
+     *
+     * @param Request     $request
+     * @param array       $winetoclientorder
+     * @param Clientorder $clientorder
+     *
+     * @return array
+     */
+    private function validationClientOrderPost(Request $request, Clientorder $clientorder, array $winetoclientorder)
+    {
+        if ($request->get('client') != null && is_int((int)$request->get('client'))) {
+            $newOrder['client'] = $request->get('client');
+        } else {
+            $newOrder['client'] = $clientorder->getClient()->getId();
+        }
+        if ($request->get('date') != null && \DateTime::createFromFormat("d.m.Y", $request->get('date'))) {
+            $newOrder['date'] = \DateTime::createFromFormat("d.m.Y", $request->get('date'));
+        } else {
+            $newOrder['date'] = $clientorder->getOrderdate();
+        }
+        if ($request->get('wine') != null && is_array($request->get('wine'))) {
+            $tmpOrders = $request->get('wine');
+            foreach ($tmpOrders as $tmpOrder) {
+                if ($tmpOrder['id'] != null && is_int((int)$tmpOrder['id'])
+                    && $tmpOrder['amount'] != null && is_int((int)$tmpOrder['amount'])
+                    && $tmpOrder['price'] != null && is_float((float)$tmpOrder['price'])) {
+                    $newOrder['wine'][] = $tmpOrder;
+                }
+            }
+            if (empty($newOrder['wine'])) {
+                foreach ($winetoclientorder as $wineorder) {
+                    /** @var Winetoclientorder $wineorder */
+                    $wine['id'] = $wineorder->getId();
+                    $wine['amount'] = $wineorder->getAmount();
+                    $wine['price'] = $wineorder->getPrice();
+                    $newOrder['wine'][] = $wine;
+                }
+            }
+        }
+
+        return $newOrder;
+    }
+
+    /**
+     * Editieren eines Kunden
+     *
+     * @param Client $client
+     * @param array  $newClient
+     *
+     * @return Client
+     */
+    private function editClient(Client $client, $newClient)
+    {
+        $em = $this->getDoctrine()->getManager();
+        //Suchen bzw erzeugen einer Stadt für einen Kunden
+        $cityRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:City');
+        $city = $cityRepo->findOneBy(array('name' => $newClient['city'], 'zipcode' => $newClient['zipcode']));
+        if (!$city) {
+            $city = new City($newClient['city'], $newClient['zipcode']);
+            $em->persist($client);
+            $em->flush();
+        }
+        if ($city) {
+            //Editieren des Kunden
+            $client->setForename($newClient['forename']);
+            $client->setSurname($newClient['surname']);
+            $client->setStreet($newClient['street']);
+            $client->setStreetno($newClient['streetno']);
+            $client->setCity($city);
+            $em->persist($client);
+            $em->flush();
+            //Suchen bzw erzeugen von Telefonnummern für einen Kunden
+            $clientphoneRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientphone');
+            $phonesToDelet = $clientphoneRepo->findBy(array('client' => $client));
+            foreach ($newClient['phone'] as $phone) {
+                foreach ($phonesToDelet as $key=>$phoneToDelete) {
+                    if ($phoneToDelete->getNumber() == $phone) {
+                        unset($phonesToDelet[$key]);
+                    }
+                    $clientphone = $clientphoneRepo->findOneBy(array('number' => $phone, 'client' => $client));
+                    if (!$clientphone) {
+                        $clientphone = new Clientphone($phone, $client);
+                        $em->persist($clientphone);
+                        $em->flush();
+                    }
+                }
+            }
+            foreach ($phonesToDelet as $phoneToDelete) {
+                $em->remove($phoneToDelete);
+                $em->flush();
+            }
+        }
+
+        return $client;
+    }
+
+    /**
+     * Editieren eines Weines
+     *
+     * @param Wine  $wine
+     * @param array $newWine
+     *
+     * @return Wine
+     */
+    private function editWine(Wine $wine, $newWine)
+    {
+
+        $em = $this->getDoctrine()->getManager();
+        $cityRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:City');
+        $city = $cityRepo->findOneBy(array('name' => $newWine['city'], 'zipcode' => $newWine['zipcode']));
+        if (!$city) {
+            $city = new City($newWine['city'], $newWine['zipcode']);
+            $em->persist($city);
+            $em->flush();
+        }
+        $countryRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Country');
+        $country = $countryRepo->findOneBy(array('name' => $newWine['country']));
+        if (!$country) {
+            $country = new Country($newWine['country']);
+            $em->persist($country);
+            $em->flush();
+        }
+        if ($country) {
+            $regionRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Region');
+            $region = $regionRepo->findOneBy(array('name' => $newWine['region']));
+            if (!$region) {
+                $region = new Region($newWine['region'], $country);
+                $em->persist($region);
+                $em->flush();
+            }
+            if ($city && $region) {
+                $vineyardRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Vineyard');
+                $vineyard = $vineyardRepo->findOneBy(array('name' => $newWine['vinyard'], 'region' => $region, 'city' => $city));
+                if (!$vineyard) {
+                    $vineyard = new Vineyard($newWine['vineyard'], $city, $region);
+                    $em->persist($vineyard);
+                    $em->flush();
+                }
+                $winekindRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winekind');
+                $winekind = $winekindRepo->findOneBy(array('name' => $newWine['kind']));
+                if (!$winekind) {
+                    $winekind = new Winekind($newWine['kind']);
+                    $em->persist($winekind);
+                    $em->flush();
+                }
+                $winetypeRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetype');
+                $winetype = $winetypeRepo->findOneBy(array('name' => $newWine['type']));
+                if (!$winetype) {
+                    $winetype = new Winetype($newWine['type']);
+                    $em->persist($winetype);
+                    $em->flush();
+                }
+                if ($vineyard && $winekind && $winetype) {
+                    $wine->setAvailable($newWine['available']);
+                    $wine->setPrice($newWine['price']);
+                    $wine->setName($newWine['name']);
+                    $wine->setVintage($newWine['vintage']);
+                    $wine->setVolume($newWine['volume']);
+                    $wine->setVineyard($vineyard);
+                    $wine->setWinetype($winetype);
+                    $wine->setWinekind($winekind);
+                    $em->persist($wine);
+                    $em->flush();
+                    $winevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winevarietal');
+                    $winetowinevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetowinevarietal');
+                    foreach ($newWine['varietal'] as $varietal) {
+                        $winevarietal = $winevarietalRepo->findOneBy(array('name' => $varietal));
+                        if (!$winevarietal) {
+                            $winevarietal = new Winevarietal($varietal);
+                            $em->persist($winevarietal);
                             $em->flush();
-                            //Wein für JSON Ausgabe vorbereiten
-                            $orderArray = $this->getOrderArray($winetoclientorder);
-                            if (!empty($orderArray)) {
-                                $response = new Response(json_encode($orderArray));
-                                $response->headers->set('Content-Type', 'application/json');
-                                $response->setStatusCode(Response::HTTP_OK);
-                            }
-                        } else {
-                            //Ausgabe für Fehlerhaften Post
-                            $response = new Response(json_encode($newOrder));
-                            $response->headers->set('Content-Type', 'application/json');
-                            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+                        }
+                        $winetowinevarietal = $winetowinevarietalRepo->findOneBy(array('wine' => $wine, 'winevarietal' => $varietal));
+                        if ($winetowinevarietal) {
+                            $winetowinevarietal = new Winetowinevarietal($wine, $varietal);
+                            $em->persist($winetowinevarietal);
+                            $em->flush();
                         }
                     }
                 }
             }
         }
 
-        return $response;
+        return $wine;
+    }
+
+    /**
+     * Editieren eines Kunden
+     *
+     * @param array       $newOrder
+     * @param Clientorder $clientorder
+     * @param array       $winetoclientorder
+     *
+     * @return Client
+     */
+    private function editOrder($newOrder, Clientorder $clientorder, array $winetoclientorder)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $cliendRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Client');
+        $wineRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Wine');
+        $client = $cliendRepo->findOneBy(array('id' => $newOrder['client']));
+        $clientorder->setClient($client);
+        $clientorder->setOrderdate($newOrder['date']);
+        foreach ($newOrder['wine'] as $wine) {
+            $wineSet = false;
+            $wine['wine'] = $wineRepo->findOneBy(array('id' => $wine['id']));
+            foreach ($winetoclientorder as $key=>$persistedwine) {
+                /** @var Winetoclientorder $persistedwine */
+                if ($persistedwine->getId() == (int)$wine['id']) {
+                    $wineSet = true;
+                    $persistedwine->setPrice($wine['price']);
+                    $persistedwine->setAmount($wine['amount']);
+                    $em->persist($persistedwine);
+                    $em->flush();
+                    unset($winetoclientorder[$key]);
+                } elseif (!$wineSet) {
+                    $wineSet = true;
+                    $orderedWine = new Winetoclientorder($wine['amount'], $wine['price'], $clientorder, $wine['wine']);
+                    $em->persist($orderedWine);
+                    $em->flush();
+                }
+            }
+        }
+        foreach ($winetoclientorder as $wineToDelete) {
+            $em->remove($wineToDelete);
+            $em->flush();
+        }
+
+
+        return $clientorder;
     }
 
     /**
@@ -1054,7 +1198,7 @@ class ApiController extends Controller
      *       "/weinverwaltung/api/delete/client/{searchCriteria}",
      *       defaults     = { "searchCriteria" = null },
      *       requirements = { "searchCriteria" = "[0-9]+" },
-     *       methods      = { "GET" }
+     *       methods      = { "GET", "DELETE" }
      * )
      *
      * @return Response json
@@ -1063,7 +1207,7 @@ class ApiController extends Controller
     {
         $response = new Response(json_encode(array('error' => 'Fehlerhafte Kunden ID')));
         $response->headers->set('Content-Type', 'application/json');
-        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
         $clientRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Client');
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
             $client = $clientRepo->findOneBy(array('id' => $searchCriteria));
@@ -1089,7 +1233,7 @@ class ApiController extends Controller
      *       "/weinverwaltung/api/delete/clientphone/{searchCriteria}",
      *       defaults     = { "searchCriteria" = null },
      *       requirements = { "searchCriteria" = "[0-9]+" },
-     *       methods      = { "GET" }
+     *       methods      = { "GET", "DELETE" }
      * )
      *
      * @return Response json
@@ -1098,7 +1242,7 @@ class ApiController extends Controller
     {
         $response = new Response(json_encode(array('error' => 'Fehlerhafte Telefon ID')));
         $response->headers->set('Content-Type', 'application/json');
-        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
         $clientphoneRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Clientphone');
         $clientRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Client');
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
@@ -1125,7 +1269,7 @@ class ApiController extends Controller
      *       "/weinverwaltung/api/delete/wine/{searchCriteria}",
      *       defaults     = { "searchCriteria" = null },
      *       requirements = { "searchCriteria" = "[0-9]+" },
-     *       methods      = { "GET" }
+     *       methods      = { "GET", "DELETE" }
      * )
      *
      * @return Response json
@@ -1134,7 +1278,7 @@ class ApiController extends Controller
     {
         $response = new Response(json_encode(array('error' => 'Fehlerhafte Wein ID')));
         $response->headers->set('Content-Type', 'application/json');
-        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
         $wineRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Wine');
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
             $wine = $wineRepo->findOneBy(array('id' => $searchCriteria));
@@ -1168,7 +1312,7 @@ class ApiController extends Controller
      *          "orderId" = "[0-9]+",
      *          "wineId"  = "[0-9]+"
      *       },
-     *       methods      = { "GET" }
+     *       methods      = { "GET", "DELETE" }
      * )
      *
      * @return Response json
@@ -1194,7 +1338,7 @@ class ApiController extends Controller
             } else {
                 $response = new Response(json_encode(array('error' => 'Fehlerhafte Wein ID')));
                 $response->headers->set('Content-Type', 'application/json');
-                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+                $response->setStatusCode(Response::HTTP_NOT_FOUND);
             }
         } else {
             if ($clientorder) {
@@ -1206,7 +1350,7 @@ class ApiController extends Controller
             } else {
                 $response = new Response(json_encode(array('error' => 'Fehlerhafte Bestell ID')));
                 $response->headers->set('Content-Type', 'application/json');
-                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+                $response->setStatusCode(Response::HTTP_NOT_FOUND);
             }
         }
 
