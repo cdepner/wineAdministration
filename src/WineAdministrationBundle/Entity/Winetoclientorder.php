@@ -1,5 +1,11 @@
 <?php
-
+    /**
+     * Wein zu Kundenbestellung ORM Objekt
+     * 
+     * Schnittstelle zur Datenbank Tabelle Winetoclientorder
+     *
+     * @author C. Depner
+     */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -31,6 +37,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Winetoclientorder
 {
     /**
+     * Wein zu Kundenbestellung ID
+     * 
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -40,6 +48,8 @@ class Winetoclientorder
     private $id;
 
     /**
+     * Wein Anzahl
+     * 
      * @var integer
      *
      * @ORM\Column(name="amount", type="integer")
@@ -47,6 +57,8 @@ class Winetoclientorder
     private $amount;
 
     /**
+     * Wein Preis
+     * 
      * @var float
      *
      * @ORM\Column(name="price", type="float", precision=10, scale=0, nullable=false)
@@ -54,6 +66,8 @@ class Winetoclientorder
     private $price;
 
     /**
+     * Wein
+     * 
      * @var Wine
      *
      * @ORM\ManyToOne(targetEntity="Wine")
@@ -64,6 +78,8 @@ class Winetoclientorder
     private $wine;
 
     /**
+     * Kundenbestellung
+     * 
      * @var Clientorder
      *
      * @ORM\ManyToOne(targetEntity="Clientorder", cascade={"persist", "remove"})
@@ -74,6 +90,8 @@ class Winetoclientorder
     private $clientOrder;
 
     /**
+     * Konstruktor
+     * 
      * @param int         $amount
      * @param float       $price
      * @param Clientorder $order

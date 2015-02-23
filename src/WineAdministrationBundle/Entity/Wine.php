@@ -1,5 +1,11 @@
 <?php
-
+    /**
+     * Wein ORM Objekt
+     * 
+     * Schnittstelle zur Datenbank Tabelle Wine
+     *
+     * @author C. Depner
+     */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -41,6 +47,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Wine
 {
     /**
+     * Wein ID
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -50,6 +57,8 @@ class Wine
     private $id;
 
     /**
+     * Verfügbarkeit des Weins
+     * 
      * @var boolean
      *
      * @ORM\Column(name="available", type="boolean", nullable=false)
@@ -57,6 +66,8 @@ class Wine
     private $available;
 
     /**
+     * Preis des Weins
+     * 
      * @var float
      *
      * @ORM\Column(name="price", type="float", precision=10, scale=0, nullable=false)
@@ -64,6 +75,8 @@ class Wine
     private $price;
 
     /**
+     * Name des Weins
+     * 
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=45, nullable=false)
@@ -71,6 +84,8 @@ class Wine
     private $name;
 
     /**
+     * Alter des Weins
+     * 
      * @var \DateTime
      *
      * @ORM\Column(name="vintage", type="date", nullable=false)
@@ -78,6 +93,8 @@ class Wine
     private $vintage;
 
     /**
+     * Füllmenge des Weins
+     * 
      * @var float
      *
      * @ORM\Column(name="volume", type="float", precision=10, scale=0, nullable=false)
@@ -85,6 +102,8 @@ class Wine
     private $volume;
 
     /**
+     * Weingut
+     * 
      * @var Vineyard
      *
      * @ORM\ManyToOne(targetEntity="Vineyard", cascade={"persist"})
@@ -95,6 +114,8 @@ class Wine
     private $vineyard;
 
     /**
+     * Wein Art
+     * 
      * @var Winekind
      *
      * @ORM\ManyToOne(targetEntity="Winekind", cascade={"persist"})
@@ -105,6 +126,8 @@ class Wine
     private $winekind;
 
     /**
+     * Wein Typ
+     * 
      * @var Winetype
      *
      * @ORM\ManyToOne(targetEntity="Winetype", cascade={"persist"})
@@ -115,6 +138,8 @@ class Wine
     private $winetype;
 
     /**
+     * Konstruktor
+     * 
      * @param bool      $available
      * @param int       $price
      * @param string    $name

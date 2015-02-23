@@ -1,5 +1,11 @@
 <?php
-
+    /**
+     * Wein Art ORM Objekt
+     * 
+     * Schnittstelle zur Datenbank Tabelle Weinkind
+     *
+     * @author C. Depner
+     */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -21,6 +27,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Winekind
 {
     /**
+     * Wein Art ID
+     * 
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -30,6 +38,8 @@ class Winekind
     private $id;
 
     /**
+     * Name der Wein Art
+     * 
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=45, nullable=false)
@@ -37,6 +47,8 @@ class Winekind
     private $name;
 
     /**
+     * Konstruktor
+     * 
      * @param string $name
      */
     public function __construct($name)

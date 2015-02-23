@@ -1,11 +1,22 @@
 <?php
-
+/**
+ * Default Controller
+ *
+ * Default anfragen
+ *
+ * @author C. Depner
+ */
 namespace WineAdministrationBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+/**
+ * Default Controller
+ *
+ * Default anfragen
+ */
 class DefaultController extends Controller
 {
     /**

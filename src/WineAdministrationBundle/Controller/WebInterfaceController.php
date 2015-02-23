@@ -1,5 +1,11 @@
 <?php
-
+/**
+ * WebInterface Controller
+ *
+ * Verarbeitung, auswertung und ausgabe aller Browser anfragen
+ *
+ * @author C. Depner
+ */
 namespace WineAdministrationBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -9,6 +15,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Guzzle\Http\Client;
 
+/**
+ * WebInterface Controller
+ *
+ * Verarbeitung, auswertung und ausgabe aller Browser anfragen
+ */
 class WebInterfaceController extends Controller
 {
     /**

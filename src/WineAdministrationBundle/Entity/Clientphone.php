@@ -1,5 +1,11 @@
 <?php
-
+    /**
+     * Kundentelefon ORM Objekt
+     * 
+     * Schnittstelle zur Datenbank Tabelle Clientphone
+     *
+     * @author C. Depner
+     */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -27,6 +33,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Clientphone
 {
     /**
+     * Kundentelefon ID
+     * 
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -36,6 +44,8 @@ class Clientphone
     private $id;
 
     /**
+     * Telefonnummer
+     * 
      * @var string
      *
      * @ORM\Column(name="number", type="string", length=20, nullable=false)
@@ -43,6 +53,8 @@ class Clientphone
     private $number;
 
     /**
+     * Kunde
+     * 
      * @var Client
      *
      * @ORM\ManyToOne(targetEntity="Client", cascade={"persist", "remove"})
@@ -53,6 +65,8 @@ class Clientphone
     private $client;
 
     /**
+     * Konstruktor
+     * 
      * @param string $number
      * @param Client $client
      */

@@ -1,5 +1,11 @@
 <?php
-
+    /**
+     * Wein zu Weinrebsorte ORM Objekt
+     * 
+     * Schnittstelle zur Datenbank Tabelle Winetowinevarietal
+     *
+     * @author C. Depner
+     */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -31,6 +37,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Winetowinevarietal
 {
     /**
+     * Wein zu Weinrebstorte ID
+     * 
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -40,6 +48,8 @@ class Winetowinevarietal
     private $id;
 
     /**
+     * Wein
+     * 
      * @var Wine
      *
      * @ORM\ManyToOne(targetEntity="Wine", cascade={"persist", "remove"})
@@ -50,6 +60,8 @@ class Winetowinevarietal
     private $wine;
 
     /**
+     * Weinrebsorte
+     * 
      * @var Winevarietal
      *
      * @ORM\ManyToOne(targetEntity="Winevarietal", cascade={"persist", "remove"})
@@ -60,6 +72,8 @@ class Winetowinevarietal
     private $winevarietal;
 
     /**
+     * Konstruktor
+     * 
      * @param Wine         $wine
      * @param Winevarietal $winevarietal
      */

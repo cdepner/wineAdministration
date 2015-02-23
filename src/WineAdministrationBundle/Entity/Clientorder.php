@@ -1,5 +1,11 @@
 <?php
-
+    /**
+     * Kundenbestellung ORM Objekt
+     * 
+     * Schnittstelle zur Datenbank Tabelle Clientorder
+     *
+     * @author C. Depner
+     */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -21,6 +27,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Clientorder
 {
     /**
+     * Kundenbestellung ID
+     * 
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -30,6 +38,8 @@ class Clientorder
     private $id;
 
     /**
+     * Datum des Kundenbestellung
+     * 
      * @var \DateTime
      *
      * @ORM\Column(name="orderDate", type="date", nullable=false)
@@ -37,6 +47,8 @@ class Clientorder
     private $orderdate;
 
     /**
+     * Kunde
+     * 
      * @var Client
      *
      * @ORM\ManyToOne(targetEntity="Client", cascade={"persist"})
@@ -47,6 +59,8 @@ class Clientorder
     private $client;
 
     /**
+     * Konstruktor
+     * 
      * @param \DateTime $orderdate
      * @param Client    $client
      */

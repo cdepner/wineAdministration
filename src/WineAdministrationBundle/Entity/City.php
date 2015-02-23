@@ -1,9 +1,14 @@
 <?php
-
+/**
+ * Stadt ORM Objekt
+ * 
+ * Schnittstelle zur Datenbank Tabelle City
+ *
+ * @author C. Depner
+ */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
 /**
  * City
  *
@@ -24,6 +29,8 @@ use Doctrine\ORM\Mapping as ORM;
 class City
 {
     /**
+     * Stadt ID
+     * 
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -33,6 +40,8 @@ class City
     private $id;
 
     /**
+     * Name der Stadt
+     * 
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=45, nullable=false)
@@ -40,6 +49,8 @@ class City
     private $name;
 
     /**
+     * Postleitzahl
+     * 
      * @var integer
      *
      * @ORM\Column(name="zipCode", type="integer", nullable=false)
@@ -47,6 +58,8 @@ class City
     private $zipcode;
 
     /**
+     * Konstruktor
+     * 
      * @param string $name
      * @param int    $zipcode
      */

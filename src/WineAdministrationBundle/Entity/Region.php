@@ -1,5 +1,11 @@
 <?php
-
+    /**
+     * Region ORM Objekt
+     * 
+     * Schnittstelle zur Datenbank Tabelle Region
+     *
+     * @author C. Depner
+     */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -27,6 +33,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Region
 {
     /**
+     * Region ID
+     * 
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -36,6 +44,8 @@ class Region
     private $id;
 
     /**
+     * Name der Region
+     * 
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=45, nullable=false)
@@ -43,6 +53,8 @@ class Region
     private $name;
 
     /**
+     * Land
+     * 
      * @var Country
      *
      * @ORM\ManyToOne(targetEntity="Country", cascade={"persist", "remove"})
@@ -53,6 +65,8 @@ class Region
     private $country;
 
     /**
+     * Konstruktor
+     * 
      * @param string  $name
      * @param Country $country
      */

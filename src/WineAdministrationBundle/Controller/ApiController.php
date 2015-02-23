@@ -1,5 +1,11 @@
 <?php
-
+/**
+ * API Controller
+ *
+ * Verarbeitung, auswertung und ausgabe aller API anfragen
+ *
+ * @author C. Depner
+ */
 namespace WineAdministrationBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -24,6 +30,11 @@ use WineAdministrationBundle\Entity\Winetowinevarietal;
 use WineAdministrationBundle\Entity\Winetype;
 use WineAdministrationBundle\Entity\Winevarietal;
 
+/**
+ * API Controller
+ *
+ * Verarbeitung, auswertung und ausgabe aller API anfragen
+ */
 class ApiController extends Controller
 {
 

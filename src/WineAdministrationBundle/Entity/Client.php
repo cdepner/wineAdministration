@@ -1,5 +1,11 @@
 <?php
-
+    /**
+     * Kunde ORM Objekt
+     * 
+     * Schnittstelle zur Datenbank Tabelle Client
+     *
+     * @author C. Depner
+     */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -33,6 +39,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Client
 {
     /**
+     * Kunden ID
+     * 
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -42,6 +50,8 @@ class Client
     private $id;
 
     /**
+     * Vorname
+     * 
      * @var string
      *
      * @ORM\Column(name="forename", type="string", length=45, nullable=false)
@@ -49,6 +59,8 @@ class Client
     private $forename;
 
     /**
+     * Nachname
+     * 
      * @var string
      *
      * @ORM\Column(name="surname", type="string", length=45, nullable=false)
@@ -56,6 +68,8 @@ class Client
     private $surname;
 
     /**
+     * Straßenname
+     * 
      * @var string
      *
      * @ORM\Column(name="street", type="string", length=45, nullable=false)
@@ -63,6 +77,8 @@ class Client
     private $street;
 
     /**
+     * Straßennummer
+     * 
      * @var string
      *
      * @ORM\Column(name="streetNo", type="string", length=9, nullable=false)
@@ -70,6 +86,8 @@ class Client
     private $streetno;
 
     /**
+     * Stadt
+     * 
      * @var City
      *
      * @ORM\ManyToOne(targetEntity="City", cascade={"persist"})
@@ -80,6 +98,8 @@ class Client
     private $city;
 
     /**
+     * Konstruktor
+     * 
      * @param string $forename
      * @param string $surname
      * @param string $street

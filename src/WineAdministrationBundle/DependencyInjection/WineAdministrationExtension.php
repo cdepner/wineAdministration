@@ -1,4 +1,9 @@
 <?php
+/**
+ * This is the class that loads and manages your bundle configuration
+ *
+ * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
+ */
 
 namespace WineAdministrationBundle\DependencyInjection;
 
@@ -16,6 +21,9 @@ class WineAdministrationExtension extends Extension
 {
     /**
      * {@inheritdoc}
+     * 
+     * @param array            $configs
+     * @param ContainerBuilder $container
      */
     public function load(array $configs, ContainerBuilder $container)
     {

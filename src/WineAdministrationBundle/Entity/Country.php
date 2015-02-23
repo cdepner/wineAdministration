@@ -1,5 +1,11 @@
 <?php
-
+    /**
+     * Land ORM Objekt
+     * 
+     * Schnittstelle zur Datenbank Tabelle Country
+     *
+     * @author C. Depner
+     */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -21,6 +27,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Country
 {
     /**
+     * Land ID
+     * 
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -30,6 +38,8 @@ class Country
     private $id;
 
     /**
+     * Name des Landes
+     * 
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=45, nullable=false)
@@ -37,7 +47,9 @@ class Country
     private $name;
 
     /**
-     * @param $name
+     * Konstruktor
+     * 
+     * @param string $name
      */
     public function __construct($name)
     {

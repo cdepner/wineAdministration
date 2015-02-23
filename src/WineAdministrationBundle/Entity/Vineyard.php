@@ -1,5 +1,11 @@
 <?php
-
+    /**
+     * Weingut ORM Objekt
+     * 
+     * Schnittstelle zur Datenbank Tabelle Vineyard
+     *
+     * @author C. Depner
+     */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -31,6 +37,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Vineyard
 {
     /**
+     * Weingut ID
+     * 
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -40,6 +48,8 @@ class Vineyard
     private $id;
 
     /**
+     * Name des Weinguts
+     * 
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=45, nullable=false)
@@ -47,6 +57,8 @@ class Vineyard
     private $name;
 
     /**
+     * Stadt
+     * 
      * @var City
      *
      * @ORM\ManyToOne(targetEntity="City", cascade={"persist", "remove"})
@@ -57,6 +69,8 @@ class Vineyard
     private $city;
 
     /**
+     * Region
+     * 
      * @var Region
      *
      * @ORM\ManyToOne(targetEntity="Region", cascade={"persist", "remove"})
@@ -67,6 +81,8 @@ class Vineyard
     private $region;
 
     /**
+     * Konstruktor
+     * 
      * @param string $name
      * @param City   $city
      * @param Region $region

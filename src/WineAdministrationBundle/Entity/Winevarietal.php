@@ -1,5 +1,11 @@
 <?php
-
+    /**
+     * Weinrebsorte ORM Objekt
+     * 
+     * Schnittstelle zur Datenbank Tabelle Winevarietal
+     *
+     * @author C. Depner
+     */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -21,6 +27,8 @@ use Doctrine\ORM\Mapping as ORM;
 class Winevarietal
 {
     /**
+     * Weinrebsorte ID
+     * 
      * @var integer
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -30,6 +38,8 @@ class Winevarietal
     private $id;
 
     /**
+     * Name der Weinrebsorte
+     * 
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=45, nullable=false)
@@ -37,6 +47,8 @@ class Winevarietal
     private $name;
 
     /**
+     * Konstruktor
+     * 
      * @param $name
      */
     public function __construct($name)

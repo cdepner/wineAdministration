@@ -1,5 +1,11 @@
 <?php
-
+    /**
+     * Wein ORM Objekt Repository
+     * 
+     * Erweiterung des Wein Objektes um individuelle Funktionen
+     *
+     * @author C. Depner
+     */
 namespace WineAdministrationBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
