@@ -49,51 +49,43 @@ class ApiController extends Controller
      *      streetno    => String,
      *      city        => String,
      *      zipcode     => Int(5),
-     *      phone       => array(
-     *          String,
-     *          String,
-     *          ...
-     *      )
+     *      phone       => String,String,...
      * )
      *
      * @Route(
      *       "/weinverwaltung/api/add/client",
-     *       methods = { "GET", "POST", "PUT" }
+     *       methods = { "POST", "PUT" }
      * )
      *
      * @return Response json
      */
     public function addClientAction(Request $request)
     {
-        if ($request->getMethod() == 'POST') {
-            //Default Response für Fehlerhaften Post
-            $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setStatusCode(Response::HTTP_NOT_FOUND);
-            $newClient = $this->validationClientAddPost($request);
-            if (!$newClient['failure']) {
-                //Kunde in die Datenbank schreiben
-                $client = $this->addClient($newClient);
-                if ($client != null) {
-                    //Kunde für JSON Ausgabe vorbereiten
-                    $usersArray = $this->getClientArray($client);
-                    if (!empty($usersArray)) {
-                        $response = new Response(json_encode($usersArray));
-                        $response->headers->set('Content-Type', 'application/json');
-                        $response->setStatusCode(Response::HTTP_CREATED);
-                    }
+        //Default Response für Fehlerhaften Post
+        $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
+        $newClient = $this->validationClientAddPost($request);
+        if (!$newClient['failure']) {
+            //Kunde in die Datenbank schreiben
+            $client = $this->addClient($newClient);
+            if ($client != null) {
+                //Kunde für JSON Ausgabe vorbereiten
+                $usersArray = $this->getClientArray($client);
+                if (!empty($usersArray)) {
+                    $response = new Response(json_encode($usersArray));
+                    $response->headers->set('Content-Type', 'application/json');
+                    $response->setStatusCode(Response::HTTP_CREATED);
                 }
-            } else {
-                //Ausgabe für Fehlerhaften Post
-                $response = new Response(json_encode($newClient));
-                $response->headers->set('Content-Type', 'application/json');
-                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
             }
-
-            return $response;
+        } else {
+            //Ausgabe für Fehlerhaften Post
+            $response = new Response(json_encode($newClient));
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->redirect($this->generateUrl('wineadministration_api_showclient', array('searchCriteria' => null)));
+        return $response;
     }
 
     /**
@@ -121,42 +113,38 @@ class ApiController extends Controller
      *
      * @Route(
      *       "/weinverwaltung/api/add/wine",
-     *       methods = { "GET", "POST", "PUT" }
+     *       methods = { "POST", "PUT" }
      * )
      *
      * @return Response json
      */
     public function addWineAction(Request $request)
     {
-        if ($request->getMethod() == 'POST') {
-            //Default Response für Fehlerhaften Post
-            $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setStatusCode(Response::HTTP_NOT_FOUND);
-            $newWine = $this->validationWineAddPost($request);
-            if (!$newWine['failure']) {
-                //Wein in die Datenbank schreiben
-                $wine = $this->addWine($newWine);
-                if ($wine != null) {
-                    //Wein für JSON Ausgabe vorbereiten
-                    $wineArray = $this->getWineArray($wine);
-                    if (!empty($wineArray)) {
-                        $response = new Response(json_encode($wineArray));
-                        $response->headers->set('Content-Type', 'application/json');
-                        $response->setStatusCode(Response::HTTP_CREATED);
-                    }
+        //Default Response für Fehlerhaften Post
+        $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
+        $newWine = $this->validationWineAddPost($request);
+        if (!$newWine['failure']) {
+            //Wein in die Datenbank schreiben
+            $wine = $this->addWine($newWine);
+            if ($wine != null) {
+                //Wein für JSON Ausgabe vorbereiten
+                $wineArray = $this->getWineArray($wine);
+                if (!empty($wineArray)) {
+                    $response = new Response(json_encode($wineArray));
+                    $response->headers->set('Content-Type', 'application/json');
+                    $response->setStatusCode(Response::HTTP_CREATED);
                 }
-            } else {
-                //Ausgabe für Fehlerhaften Post
-                $response = new Response(json_encode($newWine));
-                $response->headers->set('Content-Type', 'application/json');
-                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
             }
-
-            return $response;
+        } else {
+            //Ausgabe für Fehlerhaften Post
+            $response = new Response(json_encode($newWine));
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->redirect($this->generateUrl('wineadministration_api_showwine', array('searchCriteria' => null)));
+        return $response;
     }
 
     /**
@@ -181,35 +169,31 @@ class ApiController extends Controller
      */
     public function addOrderAction(Request $request)
     {
-        if ($request->getMethod() == 'POST') {
-            //Default Response für Fehlerhaften Post
-            $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
-            $response->headers->set('Content-Type', 'application/json');
-            $response->setStatusCode(Response::HTTP_NOT_FOUND);
-            $newOrder = $this->validationOrderAddPost($request);
-            if (!$newOrder['failure']) {
-                //Wein in die Datenbank schreiben
-                $order = $this->addOrder($newOrder);
-                if ($order != null) {
-                    //Wein für JSON Ausgabe vorbereiten
-                    $orderArray = $this->getOrderArray($order);
-                    if (!empty($orderArray)) {
-                        $response = new Response(json_encode($orderArray));
-                        $response->headers->set('Content-Type', 'application/json');
-                        $response->setStatusCode(Response::HTTP_CREATED);
-                    }
+        //Default Response für Fehlerhaften Post
+        $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
+        $response->headers->set('Content-Type', 'application/json');
+        $response->setStatusCode(Response::HTTP_NOT_FOUND);
+        $newOrder = $this->validationOrderAddPost($request);
+        if (!$newOrder['failure']) {
+            //Wein in die Datenbank schreiben
+            $order = $this->addOrder($newOrder);
+            if ($order != null) {
+                //Wein für JSON Ausgabe vorbereiten
+                $orderArray = $this->getOrderArray($order);
+                if (!empty($orderArray)) {
+                    $response = new Response(json_encode($orderArray));
+                    $response->headers->set('Content-Type', 'application/json');
+                    $response->setStatusCode(Response::HTTP_CREATED);
                 }
-            } else {
-                //Ausgabe für Fehlerhaften Post
-                $response = new Response(json_encode($newOrder));
-                $response->headers->set('Content-Type', 'application/json');
-                $response->setStatusCode(Response::HTTP_BAD_REQUEST);
             }
-
-            return $response;
+        } else {
+            //Ausgabe für Fehlerhaften Post
+            $response = new Response(json_encode($newOrder));
+            $response->headers->set('Content-Type', 'application/json');
+            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->redirect($this->generateUrl('wineadministration_api_showorder', array('searchCriteria' => null)));
+        return $response;
     }
 
     /**
@@ -247,11 +231,10 @@ class ApiController extends Controller
      */
     private function validationWineAddPost(Request $request)
     {
-
         $newWine['failure'] = false;
         //Post überprüfung
         $newWine['name']        = $request->get('name') != null        ? $request->get('name')                    : !$newWine['failure'] = true;
-        $newWine['vinyard']     = $request->get('vinyard') != null     ? $request->get('vinyard')                 : !$newWine['failure'] = true;
+        $newWine['vineyard']    = $request->get('vineyard') != null    ? $request->get('vineyard')                : !$newWine['failure'] = true;
         $newWine['city']        = $request->get('city') != null        ? $request->get('city')                    : !$newWine['failure'] = true;
         $newWine['region']      = $request->get('region') != null      ? $request->get('type')                    : !$newWine['failure'] = true;
         $newWine['country']     = $request->get('country') != null     ? $request->get('type')                    : !$newWine['failure'] = true;
@@ -337,8 +320,8 @@ class ApiController extends Controller
             $newOrder['client'] = false;
             $newOrder['failure'] = true;
         }
-        if ($request->get('date') != null && \DateTime::createFromFormat('Y-m-d',$request->get('date'))) {
-            $newOrder['date'] = \DateTime::createFromFormat("Y-m-d", $request->get('date'));
+        if ($request->get('date') != null && \DateTime::createFromFormat('d.m.Y',$request->get('date'))) {
+            $newOrder['date'] = \DateTime::createFromFormat("d.m.Y", $request->get('date'));
         } else {
             $newOrder['date'] = false;
             $newOrder['failure'] = true;
@@ -430,7 +413,7 @@ class ApiController extends Controller
             }
             if ($city && $region) {
                 $vineyardRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Vineyard');
-                $vineyard = $vineyardRepo->findOneBy(array('name' => $wineArray['vinyard'], 'region' => $region, 'city' => $city));
+                $vineyard = $vineyardRepo->findOneBy(array('name' => $wineArray['vineyard'], 'region' => $region, 'city' => $city));
                 if (!$vineyard) {
                     $vineyard = new Vineyard($wineArray['vineyard'], $city, $region);
                     $em->persist($vineyard);
@@ -453,14 +436,12 @@ class ApiController extends Controller
                 if ($vineyard && $winetype && $winekind) {
                     $clientRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Wine');
                     $wine = $clientRepo->findOneBy(array(
-                        'available' => $wineArray['available'],
-                        'price'     => $wineArray['price'],
                         'name'      => $wineArray['name'],
                         'vintage'   => $wineArray['vintage'],
                         'volume'    => $wineArray['volume'],
                         'winekind'  => $winekind,
                         'winetype'  => $winetype,
-                        'vinyard'   => $vineyard
+                        'vineyard'   => $vineyard
                     ));
                     if (!$wine) {
                         $wine = new Wine($wineArray['available'], $wineArray['price'], $wineArray['name'], $wineArray['vintage'], $wineArray['volume'], $vineyard, $winekind, $winetype);
@@ -469,17 +450,17 @@ class ApiController extends Controller
                     }
                     if ($wine) {
                         $winevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winevarietal');
-                        $winetowinevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winevarietal');
+                        $winetowinevarietalRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetowinevarietal');
                         foreach ($wineArray['varietal'] as $varietal) {
-                            $winevarietal = $winevarietalRepo->findOneBy(array('varietal' => $varietal));
+                            $winevarietal = $winevarietalRepo->findOneBy(array('name' => $varietal));
                             if (!$winevarietal) {
                                 $winevarietal = new Winevarietal($varietal);
                                 $em->persist($winevarietal);
                                 $em->flush();
                             }
-                            $winetowinevarietal = $winetowinevarietalRepo->findOneBy(array('varietal' => $varietal, $wine));
+                            $winetowinevarietal = $winetowinevarietalRepo->findOneBy(array('winevarietal' => $winevarietal, 'wine' => $wine));
                             if (!$winetowinevarietal) {
-                                $winetowinevarietal = new Winetowinevarietal($wine, $varietal);
+                                $winetowinevarietal = new Winetowinevarietal($wine, $winevarietal);
                                 $em->persist($winetowinevarietal);
                                 $em->flush();
                             }
@@ -702,7 +683,7 @@ class ApiController extends Controller
                     'volume'    => $wine->getVolume(),
                     'vineyard'  => $wine->getVineyard()->getName(),
                     'city'      => $wine->getVineyard()->getCity()->getName(),
-                    'zipcode'      => $wine->getVineyard()->getCity()->getZipcode(),
+                    'zipcode'   => $wine->getVineyard()->getCity()->getZipcode(),
                     'region'    => $wine->getVineyard()->getRegion()->getName(),
                     'country'   => $wine->getVineyard()->getRegion()->getCountry()->getName(),
                     'kind'      => $wine->getWinekind()->getName(),
@@ -851,7 +832,7 @@ class ApiController extends Controller
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
             /** @var Client $client */
             $client = $clientRepo->findOneBy(array('id' => $searchCriteria));
-            if ($client && $request->getMethod() == 'POST') {
+            if ($client) {
                 $newClient = $this->validationClientEditPost($request, $client);
                 $editClient = $this->editClient($client, $newClient);
                 //Wein für JSON Ausgabe vorbereiten
@@ -884,11 +865,7 @@ class ApiController extends Controller
      *      vintage     => Int(4),
      *      volume      => Float,
      *      price       => Float,
-     *      varietal => array(
-     *          String,
-     *          String,
-     *          ...
-     *      )
+     *      varietal    => String,String
      * )
      *
      * @Route(
@@ -909,7 +886,7 @@ class ApiController extends Controller
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
             /** @var Wine $wine */
             $wine = $wineRepo->findOneBy(array('id' => $searchCriteria));
-            if ($wine && $request->getMethod() == 'POST') {
+            if ($wine) {
                 $newWine = $this->validationWineEditPost($request, $wine);
                 $editWine = $this->editWine($wine, $newWine);
                 //Wein für JSON Ausgabe vorbereiten
@@ -1007,7 +984,7 @@ class ApiController extends Controller
     private function validationWineEditPost(Request $request, Wine $wine)
     {
         $newWine['name']        = $request->get('name') != null        ? $request->get('name')                    : $wine->getName();
-        $newWine['vinyard']     = $request->get('vinyard') != null     ? $request->get('vinyard')                 : $wine->getVineyard()->getName();
+        $newWine['vineyard']    = $request->get('vineyard') != null    ? $request->get('vineyard')                : $wine->getVineyard()->getName();
         $newWine['city']        = $request->get('city') != null        ? $request->get('city')                    : $wine->getVineyard()->getCity()->getName();
         $newWine['region']      = $request->get('region') != null      ? $request->get('type')                    : $wine->getVineyard()->getRegion()->getName();
         $newWine['country']     = $request->get('country') != null     ? $request->get('type')                    : $wine->getVineyard()->getRegion()->getCountry()->getName();
@@ -1150,7 +1127,6 @@ class ApiController extends Controller
      */
     private function editWine(Wine $wine, $newWine)
     {
-
         $em = $this->getDoctrine()->getManager();
         $cityRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:City');
         $city = $cityRepo->findOneBy(array('name' => $newWine['city'], 'zipcode' => $newWine['zipcode']));
@@ -1176,7 +1152,7 @@ class ApiController extends Controller
             }
             if ($city && $region) {
                 $vineyardRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Vineyard');
-                $vineyard = $vineyardRepo->findOneBy(array('name' => $newWine['vinyard'], 'region' => $region, 'city' => $city));
+                $vineyard = $vineyardRepo->findOneBy(array('name' => $newWine['vineyard'], 'region' => $region, 'city' => $city));
                 if (!$vineyard) {
                     $vineyard = new Vineyard($newWine['vineyard'], $city, $region);
                     $em->persist($vineyard);

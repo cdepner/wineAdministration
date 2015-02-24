@@ -324,10 +324,10 @@ class WebInterfaceController extends Controller
      * @param Request $request
      *
      * @Route(
-     *       "/weinverwaltung/add/client",
+     *       "/weinverwaltung/add/wine",
      *       methods      = { "GET", "POST" }
      * )
-     * @Template("WineAdministrationBundle:WebInterface:showClient.html.twig")
+     * @Template("WineAdministrationBundle:WebInterface:showWine.html.twig")
      *
      * @return array|Response
      */
