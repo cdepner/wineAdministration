@@ -42,7 +42,19 @@ class ApiController extends Controller
     /**
      * Api Client hinzufügen
      *
-     * @param Request $request
+     * @param Request $request array(
+     *      forename    => String,
+     *      surname     => String,
+     *      street      => String,
+     *      streetno    => String,
+     *      city        => String,
+     *      zipcode     => Int(5),
+     *      phone       => array(
+     *          String,
+     *          String,
+     *          ...
+     *      )
+     * )
      *
      * @Route(
      *       "/weinverwaltung/api/add/client",
@@ -87,7 +99,25 @@ class ApiController extends Controller
     /**
      * Api Wein erstellen
      *
-     * @param Request $request
+     * @param Request $request array(
+     *      available   => Bool,
+     *      name        => String,
+     *      vineyard    => String,
+     *      city        => String,
+     *      zipcode     => Int(5),
+     *      region      => String,
+     *      country     => String,
+     *      kind        => String,
+     *      type        => String,
+     *      vintage     => Int(4),
+     *      volume      => Float,
+     *      price       => Float,
+     *      varietal => array(
+     *          String,
+     *          String,
+     *          ...
+     *      )
+     * )
      *
      * @Route(
      *       "/weinverwaltung/api/add/wine",
@@ -132,7 +162,15 @@ class ApiController extends Controller
     /**
      * Api Bestellung erstellen
      *
-     * @param Request $request
+     * @param Request $request array(
+     *      client  => Int,
+     *      date    => String,
+     *      wine    => array(
+     *          amount  => Int,
+     *          price   => Float,
+     *          wine    => Int
+     *      )
+     * )
      *
      * @Route(
      *       "/weinverwaltung/api/add/order",
@@ -781,7 +819,19 @@ class ApiController extends Controller
      * Api Client editieren
      *
      * @param string  $searchCriteria Client ID
-     * @param Request $request
+     * @param Request $request array(
+     *      forename    => String,
+     *      surname     => String,
+     *      street      => String,
+     *      streetno    => String,
+     *      city        => String,
+     *      zipcode     => Int(5),
+     *      phone       => array(
+     *          String,
+     *          String,
+     *          ...
+     *      )
+     * )
      *
      * @Route(
      *       "/weinverwaltung/api/edit/client/{searchCriteria}",
@@ -821,7 +871,25 @@ class ApiController extends Controller
      * Api Wine editieren
      *
      * @param string  $searchCriteria Wine ID
-     * @param Request $request
+     * @param Request $request array(
+     *      available   => Bool,
+     *      name        => String,
+     *      vineyard    => String,
+     *      city        => String,
+     *      zipcode     => Int(5),
+     *      region      => String,
+     *      country     => String,
+     *      kind        => String,
+     *      type        => String,
+     *      vintage     => Int(4),
+     *      volume      => Float,
+     *      price       => Float,
+     *      varietal => array(
+     *          String,
+     *          String,
+     *          ...
+     *      )
+     * )
      *
      * @Route(
      *       "/weinverwaltung/api/edit/wine/{searchCriteria}",
@@ -861,7 +929,15 @@ class ApiController extends Controller
      * Api Order editieren
      *
      * @param string  $orderId Order ID
-     * @param Request $request
+     * @param Request $request array(
+     *      client  => Int,
+     *      date    => String,
+     *      wine    => array(
+     *          amount  => Int,
+     *          price   => Float,
+     *          wine    => Int
+     *      )
+     * )
      *
      * @Route(
      *       "/weinverwaltung/api/edit/order/{orderId}",
