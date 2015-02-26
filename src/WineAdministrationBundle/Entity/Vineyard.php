@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
  *     uniqueConstraints={
  *         @ORM\UniqueConstraint(
  *             name="UNIQUE_name",
- *             columns={"name"}
+ *             columns={"name", "city", "region"}
  *         )
  *     },
  *     indexes={
