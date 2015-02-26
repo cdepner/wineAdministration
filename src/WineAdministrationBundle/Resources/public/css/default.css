@@ -1,3 +1,4 @@
 .table { display: table; }
 .table>* { display: table-row; }
 .table>*>* { display: table-cell; }
+.table>*>*>input.noMargin {margin-bottom: 0}

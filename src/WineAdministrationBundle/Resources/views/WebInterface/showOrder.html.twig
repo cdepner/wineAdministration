@@ -1,14 +1,7 @@
-{% extends '::base.html.twig' %}
-{% block title %}Weinverwaltung - Kundenverwaltung{% endblock %}
-{% block stylesheets %}
-    {% stylesheets
-    '@WineAdministrationBundle/Resources/public/css/*css'
-    combine=true %}
-    <link href="{{ asset_url }}" type="text/css" rel="stylesheet" />
-    {% endstylesheets %}
-{% endblock %}
+{% extends 'WineAdministrationBundle:Default:defaultLayout.html.twig' %}
+{% block title %}Weinverwaltung - Bestellungsverwaltung{% endblock %}
 {% block body %}
-    {% include 'WineAdministrationBundle:Default:navigation.html.twig' %}
+    {% include 'WineAdministrationBundle:Default:navigation.html.twig' with {'activeMenu': 'order'} %}
         <div class="table">
             <div>
                 <div>Bestellnummer ID</div>

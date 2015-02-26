@@ -1,0 +1,17 @@
+{% extends '::base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block stylesheets %}
+{% stylesheets
+'@WineAdministrationBundle/Resources/public/css/*css'
+combine=true %}
+    <link href="{{ asset_url }}" type="text/css" rel="stylesheet" />
+{% endstylesheets %}
+{% endblock %}
+{% block javascripts %}
+{% javascripts
+'@WineAdministrationBundle/Resources/public/js/vendor/*js'
+'@WineAdministrationBundle/Resources/public/js/foundation/*js'
+%}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+{% endjavascripts %}
+{% endblock %}

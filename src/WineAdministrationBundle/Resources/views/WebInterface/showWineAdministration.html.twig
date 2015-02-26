@@ -1,7 +1,6 @@
-{% extends '::base.html.twig' %}
-{% block title %}
-    Weinverwaltung
-{% endblock %}
+{% extends 'WineAdministrationBundle:Default:defaultLayout.html.twig' %}
+{% block title %}Weinverwaltung - Überblick{% endblock %}
 {% block body %}
-    {% include 'WineAdministrationBundle:Default:navigation.html.twig' %}
+    {% include 'WineAdministrationBundle:Default:navigation.html.twig' with {'activeMenu': 'main'} %}
+<i class="fi-star"></i>
 {% endblock %}
