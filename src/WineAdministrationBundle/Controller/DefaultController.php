@@ -23,6 +23,7 @@ class DefaultController extends Controller
      * Start Seite
      *
      * @Route("/weinverwaltung/index.jsp")
+     * @Route("/weinverwaltung/index.php")
      */
     public function indexAction()
     {

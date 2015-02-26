@@ -186,7 +186,7 @@ class WebInterfaceController extends Controller
      *       requirements = { "searchCriteria" = "[a-zA-Z0-9_]+" },
      *       methods      = { "GET", "POST" }
      * )
-     * @Template("WineAdministrationBundle:WebInterface:showClient.html.twig")
+     * @Template("WineAdministrationBundle:WebInterface:showOrder.html.twig")
      *
      * @return array|Response
      */
@@ -234,12 +234,12 @@ class WebInterfaceController extends Controller
      * @param Request $request
      *
      * @Route(
-     *       "/weinverwaltung/edit/client/{searchCriteria}",
+     *       "/weinverwaltung/edit/wine/{searchCriteria}",
      *       defaults     = { "searchCriteria" = null },
      *       requirements = { "searchCriteria" = "[a-zA-Z0-9]+" },
      *       methods      = { "GET", "POST" }
      * )
-     * @Template("WineAdministrationBundle:WebInterface:showClient.html.twig")
+     * @Template("WineAdministrationBundle:WebInterface:showWine.html.twig")
      *
      * @return array|Response
      */
@@ -324,10 +324,10 @@ class WebInterfaceController extends Controller
      * @param Request $request
      *
      * @Route(
-     *       "/weinverwaltung/add/client",
+     *       "/weinverwaltung/add/wine",
      *       methods      = { "GET", "POST" }
      * )
-     * @Template("WineAdministrationBundle:WebInterface:showClient.html.twig")
+     * @Template("WineAdministrationBundle:WebInterface:showWine.html.twig")
      *
      * @return array|Response
      */
