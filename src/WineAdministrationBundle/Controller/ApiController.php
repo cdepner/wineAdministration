@@ -986,13 +986,15 @@ class ApiController extends Controller
         $newWine['name']        = $request->get('name') != null        ? $request->get('name')                    : $wine->getName();
         $newWine['vineyard']    = $request->get('vineyard') != null    ? $request->get('vineyard')                : $wine->getVineyard()->getName();
         $newWine['city']        = $request->get('city') != null        ? $request->get('city')                    : $wine->getVineyard()->getCity()->getName();
-        $newWine['region']      = $request->get('region') != null      ? $request->get('type')                    : $wine->getVineyard()->getRegion()->getName();
-        $newWine['country']     = $request->get('country') != null     ? $request->get('type')                    : $wine->getVineyard()->getRegion()->getCountry()->getName();
+        $newWine['region']      = $request->get('region') != null      ? $request->get('region')                  : $wine->getVineyard()->getRegion()->getName();
+        $newWine['country']     = $request->get('country') != null     ? $request->get('country')                 : $wine->getVineyard()->getRegion()->getCountry()->getName();
         $newWine['kind']        = $request->get('kind') != null        ? $request->get('kind')                    : $wine->getWinekind()->getName();
         $newWine['type']        = $request->get('type') != null        ? $request->get('type')                    : $wine->getWinetype()->getName();
         $newWine['varietal']    = $request->get('varietal') != null    ? explode(',', $request->get('varietal'))  : $this->getWineVarietal($wine);
-        if ($request->get('available') != null && is_bool($request->get('available'))) {
-            $newWine['available'] = $request->get('available');
+        if ($request->get('available') != null && $request->get('available') == 'x') {
+            $newWine['available'] = true;
+        } elseif ($request->get('available') != null && $request->get('available') == 'o') {
+            $newWine['available'] = false;
         } else {
             $newWine['available'] = $wine->getAvailable();
         }
@@ -1173,6 +1175,7 @@ class ApiController extends Controller
                     $em->flush();
                 }
                 if ($vineyard && $winekind && $winetype) {
+                    var_dump($newWine);die;
                     $wine->setAvailable($newWine['available']);
                     $wine->setPrice($newWine['price']);
                     $wine->setName($newWine['name']);
@@ -1192,12 +1195,14 @@ class ApiController extends Controller
                             $em->persist($winevarietal);
                             $em->flush();
                         }
-                        $winetowinevarietal = $winetowinevarietalRepo->findOneBy(array('wine' => $wine, 'winevarietal' => $varietal));
-                        if ($winetowinevarietal) {
-                            $winetowinevarietal = new Winetowinevarietal($wine, $varietal);
-                            $em->persist($winetowinevarietal);
+                        $oldWinetowinevarietal = $winetowinevarietalRepo->findBy(array('wine' => $wine));
+                        foreach ($oldWinetowinevarietal as $oldvarietal) {
+                            $em->remove($oldvarietal);
                             $em->flush();
                         }
+                        $winetowinevarietal = new Winetowinevarietal($wine, $winevarietal);
+                        $em->persist($winetowinevarietal);
+                        $em->flush();
                     }
                 }
             }

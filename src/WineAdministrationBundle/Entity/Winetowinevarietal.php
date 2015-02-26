@@ -52,9 +52,9 @@ class Winetowinevarietal
      * 
      * @var Wine
      *
-     * @ORM\ManyToOne(targetEntity="Wine", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="Wine", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="wine", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     *   @ORM\JoinColumn(name="wine", referencedColumnName="id", nullable=false)
      * })
      */
     private $wine;
@@ -64,9 +64,9 @@ class Winetowinevarietal
      * 
      * @var Winevarietal
      *
-     * @ORM\ManyToOne(targetEntity="Winevarietal", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="Winevarietal", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="wineVarietal", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     *   @ORM\JoinColumn(name="wineVarietal", referencedColumnName="id", nullable=false)
      * })
      */
     private $winevarietal;

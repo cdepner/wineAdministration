@@ -21,8 +21,8 @@
                 <div><input type="text" name="zipcode" form="user_edit_{{ user.id }}" value="{{ user.zipCode }}"></div>
                 <div><input type="text" name="city" form="user_edit_{{ user.id }}" value="{{ user.city }}"></div>
                 <div><input type="text" name="phone" form="user_edit_{{ user.id }}" value="{{ user.phone|join(',') }}"></div>
-                <div><button type="submit" name="submit" form="user_edit_{{ user.id }}"><i class="fi-pencil"></i></button</div>
-                <div><input type="submit" name="delete" form="user_edit_{{ user.id }}" value=" Löschen "></div>
+                <div><button type="submit" name="submit" form="user_edit_{{ user.id }}" value=" Bearbeiten "><i class="fi-pencil"></i></button></div>
+                <div><button type="submit" name="delete" form="user_edit_{{ user.id }}" value=" Löschen "><i class="fi-x"></i></button></div>
             </form>
 {% endfor %}
             <form id="user_add" action="{{ path('wineadministration_webinterface_addclient') }}" method="POST">
