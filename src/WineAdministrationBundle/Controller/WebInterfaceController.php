@@ -151,7 +151,7 @@ class WebInterfaceController extends Controller
         $response->headers->set('Content-Type', 'application/json');
         $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $post = array();
-        if ($searchCriteria && $request->getMethod() == 'POST') {
+        if ($searchCriteria) {
             if ($request->get('submit') && !$request->get('delete')) {
                 $post['forename']   = $request->get('forename');
                 $post['surname']    = $request->get('surname');
@@ -197,7 +197,7 @@ class WebInterfaceController extends Controller
         $response->headers->set('Content-Type', 'application/json');
         $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $post = array();
-        if ($request->getMethod() == 'POST') {
+        if ($searchCriteria) {
             if ($request->get('submit') && !$request->get('delete')) {
                 $tmpOrders = explode(';', $request->get('wine'));
                 if (is_array($tmpOrders)) {
@@ -250,7 +250,7 @@ class WebInterfaceController extends Controller
         $response->headers->set('Content-Type', 'application/json');
         $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $post = array();
-        if ($request->getMethod() == 'POST') {
+        if ($searchCriteria) {
             if ($request->get('submit') && !$request->get('delete')) {
                 $post['name']  = $request->get('name');
                 $post['varietal']   = $request->get('varietal');
@@ -295,27 +295,19 @@ class WebInterfaceController extends Controller
      */
     public function addClientAction(Request $request)
     {
-        //Default Response für Fehlerhaften Post
-        $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
-        $response->headers->set('Content-Type', 'application/json');
-        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $post = array();
-        if ($request->getMethod() == 'POST') {
-            $post['forename']  = $request->get('forename');
-            $post['surname']   = $request->get('surname');
-            $post['street']    = $request->get('street');
-            $post['streetno']  = $request->get('streetno');
-            $post['city']      = $request->get('city');
-            $post['zipcode']   = $request->get('zipcode');
-            $post['phone']     = $request->get('phone');
-            $url = $this->generateUrl('wineadministration_api_addclient', array(), true);
-            $users = json_decode($this->postApiRequest($url, $post));
-            return array(
-                'users' => $users
-            );
-        }
-
-        return $response;
+        $post['forename']  = $request->get('forename');
+        $post['surname']   = $request->get('surname');
+        $post['street']    = $request->get('street');
+        $post['streetno']  = $request->get('streetno');
+        $post['city']      = $request->get('city');
+        $post['zipcode']   = $request->get('zipcode');
+        $post['phone']     = $request->get('phone');
+        $url = $this->generateUrl('wineadministration_api_addclient', array(), true);
+        $users = json_decode($this->postApiRequest($url, $post));
+        return array(
+            'users' => $users
+        );
     }
 
     /**
@@ -333,33 +325,25 @@ class WebInterfaceController extends Controller
      */
     public function addWineAction(Request $request)
     {
-        //Default Response für Fehlerhaften Post
-        $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
-        $response->headers->set('Content-Type', 'application/json');
-        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $post = array();
-        if ($request->getMethod() == 'POST') {
-            $post['name']       = $request->get('name');
-            $post['varietal']   = $request->get('varietal');
-            $post['vintage']    = $request->get('vintage');
-            $post['vineyard']   = $request->get('vineyard');
-            $post['city']       = $request->get('city');
-            $post['zipcode']    = $request->get('zipcode');
-            $post['region']     = $request->get('region');
-            $post['country']    = $request->get('country');
-            $post['kind']       = $request->get('kind');
-            $post['type']       = $request->get('type');
-            $post['volume']     = $request->get('volume');
-            $post['price']      = $request->get('price');
-            $post['available']  = $request->get('available') == 'x' ? true : false;
-            $url = $this->generateUrl('wineadministration_api_addwine', array(), true);
-            $wines = json_decode($this->postApiRequest($url, $post));
-            return array(
-                'users' => $wines
-            );
-        }
-
-        return $response;
+        $post['name']       = $request->get('name');
+        $post['varietal']   = $request->get('varietal');
+        $post['vintage']    = $request->get('vintage');
+        $post['vineyard']   = $request->get('vineyard');
+        $post['city']       = $request->get('city');
+        $post['zipcode']    = $request->get('zipcode');
+        $post['region']     = $request->get('region');
+        $post['country']    = $request->get('country');
+        $post['kind']       = $request->get('kind');
+        $post['type']       = $request->get('type');
+        $post['volume']     = $request->get('volume');
+        $post['price']      = $request->get('price');
+        $post['available']  = $request->get('available') == 'x' ? true : false;
+        $url = $this->generateUrl('wineadministration_api_addwine', array(), true);
+        $wines = json_decode($this->postApiRequest($url, $post));
+        return array(
+            'users' => $wines
+        );
     }
 
     /**
@@ -377,33 +361,25 @@ class WebInterfaceController extends Controller
      */
     public function addOrderAction(Request $request)
     {
-        //Default Response für Fehlerhaften Post
-        $response = new Response(json_encode(array('error' => 'Fehlerhafter Post')));
-        $response->headers->set('Content-Type', 'application/json');
-        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $post = array();
-        if ($request->getMethod() == 'POST') {
-            $tmpOrders = explode(';', $request->get('wine'));
-            if (is_array($tmpOrders)) {
-                foreach ($tmpOrders as $key => $tmpOrder) {
-                    $tmpWines = explode(',', $tmpOrder);
-                    if (is_array($tmpWines)) {
-                        $post['wine'][$key]['amount'] = $tmpWines[0];
-                        $post['wine'][$key]['price'] = $tmpWines[1];
-                        $post['wine'][$key]['id'] = $tmpWines[2];
-                    }
+        $tmpOrders = explode(';', $request->get('wine'));
+        if (is_array($tmpOrders)) {
+            foreach ($tmpOrders as $key => $tmpOrder) {
+                $tmpWines = explode(',', $tmpOrder);
+                if (is_array($tmpWines)) {
+                    $post['wine'][$key]['amount'] = $tmpWines[0];
+                    $post['wine'][$key]['price'] = $tmpWines[1];
+                    $post['wine'][$key]['id'] = $tmpWines[2];
                 }
             }
-            $post['client']     = $request->get('client');
-            $post['date']       = $request->get('orderdate');
-            $url = $this->generateUrl('wineadministration_api_addclient', array(), true);
-            $users = json_decode($this->postApiRequest($url, $post));
-            return array(
-                'users' => $users
-            );
         }
-
-        return $response;
+        $post['client']     = $request->get('client');
+        $post['date']       = $request->get('orderdate');
+        $url = $this->generateUrl('wineadministration_api_addclient', array(), true);
+        $users = json_decode($this->postApiRequest($url, $post));
+        return array(
+            'users' => $users
+        );
     }
 
     /**

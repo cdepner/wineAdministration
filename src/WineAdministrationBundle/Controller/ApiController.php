@@ -1175,7 +1175,6 @@ class ApiController extends Controller
                     $em->flush();
                 }
                 if ($vineyard && $winekind && $winetype) {
-                    var_dump($newWine);die;
                     $wine->setAvailable($newWine['available']);
                     $wine->setPrice($newWine['price']);
                     $wine->setName($newWine['name']);
@@ -1195,14 +1194,20 @@ class ApiController extends Controller
                             $em->persist($winevarietal);
                             $em->flush();
                         }
-                        $oldWinetowinevarietal = $winetowinevarietalRepo->findBy(array('wine' => $wine));
-                        foreach ($oldWinetowinevarietal as $oldvarietal) {
-                            $em->remove($oldvarietal);
+                        $winetovarietal = $winetowinevarietalRepo->findOneBy(array('wine' => $wine, 'winevarietal' => $winevarietal));
+                        if (!$winetovarietal) {
+                            $em->remove($winetovarietal);
                             $em->flush();
                         }
-                        $winetowinevarietal = new Winetowinevarietal($wine, $winevarietal);
-                        $em->persist($winetowinevarietal);
-                        $em->flush();
+                    }
+                    foreach ($newWine['varietal'] as $varietal) {
+                        $winevarietal = $winevarietalRepo->findOneBy(array('name' => $varietal));
+                        $winetovarietal = $winetowinevarietalRepo->findOneBy(array('wine' => $wine, 'winevarietal' => $winevarietal));
+                        if (!$winetovarietal) {
+                            $winetowinevarietal = new Winetowinevarietal($wine, $winevarietal);
+                            $em->persist($winetowinevarietal);
+                            $em->flush();
+                        }
                     }
                 }
             }

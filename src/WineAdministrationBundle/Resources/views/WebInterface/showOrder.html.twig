@@ -2,22 +2,23 @@
 {% block title %}Weinverwaltung - Bestellungsverwaltung{% endblock %}
 {% block body %}
     {% include 'WineAdministrationBundle:Default:navigation.html.twig' with {'activeMenu': 'order'} %}
+    <div class="row">
         <div class="table">
             <div>
-                <div>Bestellnummer ID</div>
+                <div></div>
                 <div>Kunden ID</div>
                 <div>Bestelldatum</div>
-                <div>Bestellung</div>
+                <div>Bestellung ( Anzahl der Weine,Preis des Weines,Wein ID;...,...,...;... )</div>
             </div>
 {% for order in orders %}
             <form id="order_edit_{{ order.id }}" action="{{ path('wineadministration_webinterface_editorder', { 'searchCriteria': order.id }) }}" method="POST">
-                <div><input type="text" name="id" form="order_edit_{{ order.id }}" value="{{ order.id }}"></div>
+                <div>{{ order.id }}&nbsp;</div>
                 <div><input type="text" name="client" form="order_edit_{{ order.id }}" value="{{ order.client.id }}"></div>
                 <div><input type="text" name="orderdate" form="order_edit_{{ order.id }}" value="{{ order.orderDate.date|date("d.m.Y") }}"></div>
 {% set wineOrder = '' %}{% for wine in order.clientOrder %}{% set wineOrder = wineOrder ~ [wine.amount, wine.price, wine.wine.id]|join(',') ~ ';' %}{% endfor %}
                 <div><input type="text" name="wine" form="order_edit_{{ order.id }}" value="{{ wineOrder }}"></div>
-                <div><input type="submit" name="submit" form="order_edit_{{ order.id }}" value=" Bearbeiten "></div>
-                <div><input type="submit" name="delete" form="order_edit_{{ order.id }}" value=" Löschen "></div>
+                <div><button class="tiny button postfix" type="submit" name="submit" form="order_edit_{{ order.id }}" value=" Bearbeiten "><i class="fi-pencil"></i></button></div>
+                <div><button class="tiny button postfix radius" type="submit" name="delete" form="order_edit_{{ order.id }}" value=" Löschen "><i class="fi-x"></i></button></div>
             </form>
 {% endfor %}
             <form id="order_add" action="{{ path('wineadministration_webinterface_addorder') }}" method="POST">
@@ -25,7 +26,8 @@
                 <div><input type="text" name="client" form="order_add" value=""></div>
                 <div><input type="text" name="orderdate" form="order_add" value=""></div>
                 <div><input type="text" name="wine" form="order_add" value=""></div>
-                <div><input type="submit" name="submit" form="order_add" value=" Hinzufügen "></div>
+                <div><button class="tiny button postfix radius special" type="submit" name="delete" form="order_add" value=" Hinzufügen "><i class="fi-plus"></i></button></div>
             </form>
         </div>
+    </div>
 {% endblock %}

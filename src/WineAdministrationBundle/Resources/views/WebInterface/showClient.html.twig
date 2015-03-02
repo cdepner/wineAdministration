@@ -2,8 +2,10 @@
 {% block title %}Weinverwaltung - Kundenverwaltung{% endblock %}
 {% block body %}
     {% include 'WineAdministrationBundle:Default:navigation.html.twig' with {'activeMenu': 'client'} %}
+    <div class="row">
         <div class="table">
             <div>
+                <div></div>
                 <div>Vorname</div>
                 <div>Nachname</div>
                 <div>Straße</div>
@@ -14,6 +16,7 @@
             </div>
 {% for user in users %}
             <form id="user_edit_{{ user.id }}" action="{{ path('wineadministration_webinterface_editclient', { 'searchCriteria': user.id }) }}" method="POST">
+                <div>{{ user.id }}&nbsp;</div>
                 <div><input type="text" name="forename" form="user_edit_{{ user.id }}" value="{{ user.forename }}"></div>
                 <div><input type="text" name="surname" form="user_edit_{{ user.id }}" value="{{ user.surname }}"></div>
                 <div><input type="text" name="street" form="user_edit_{{ user.id }}" value="{{ user.street }}"></div>
@@ -21,11 +24,12 @@
                 <div><input type="text" name="zipcode" form="user_edit_{{ user.id }}" value="{{ user.zipCode }}"></div>
                 <div><input type="text" name="city" form="user_edit_{{ user.id }}" value="{{ user.city }}"></div>
                 <div><input type="text" name="phone" form="user_edit_{{ user.id }}" value="{{ user.phone|join(',') }}"></div>
-                <div><button type="submit" name="submit" form="user_edit_{{ user.id }}" value=" Bearbeiten "><i class="fi-pencil"></i></button></div>
-                <div><button type="submit" name="delete" form="user_edit_{{ user.id }}" value=" Löschen "><i class="fi-x"></i></button></div>
+                <div><button class="tiny button postfix" type="submit" name="submit" form="user_edit_{{ user.id }}" value=" Bearbeiten "><i class="fi-pencil"></i></button></div>
+                <div><button class="tiny button postfix radius" type="submit" name="delete" form="user_edit_{{ user.id }}" value=" Löschen "><i class="fi-x"></i></button></div>
             </form>
 {% endfor %}
             <form id="user_add" action="{{ path('wineadministration_webinterface_addclient') }}" method="POST">
+                <div></div>
                 <div><input type="text" name="forename" form="user_add" value=""></div>
                 <div><input type="text" name="surname" form="user_add" value=""></div>
                 <div><input type="text" name="street" form="user_add" value=""></div>
@@ -33,7 +37,9 @@
                 <div><input type="text" name="zipcode" form="user_add" value=""></div>
                 <div><input type="text" name="city" form="user_add" value=""></div>
                 <div><input type="text" name="phone" form="user_add" value=""></div>
-                <div><input type="submit" form="user_add" value=" Hinzufügen "></div>
+                <div><button class="tiny button postfix radius special" type="submit" form="user_add" value=" Hinzufügen "><i class="fi-plus"></i></button></div>
+                <div></div>
             </form>
         </div>
+    </div>
 {% endblock %}

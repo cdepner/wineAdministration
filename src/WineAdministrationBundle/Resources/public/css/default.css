@@ -1,4 +1,21 @@
 .table { display: table; }
 .table>* { display: table-row; }
 .table>*>* { display: table-cell; }
-.table>*>*>input.noMargin {margin-bottom: 0}
+form>div>input[type="text"] {
+    margin: 0;
+}
+form>div>button {
+    padding-top: 0;
+    top: -1px;
+}
+button.postfix.button {
+    padding-right: 5px;
+    padding-left: 5px;
+}
+button.postfix.button.special {
+    margin-bottom: 0px;
+    top: -15px;
+}
+nav.top-bar {
+    margin-bottom: 50px;
+}
