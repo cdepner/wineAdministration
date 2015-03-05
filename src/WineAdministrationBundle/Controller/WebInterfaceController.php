@@ -202,7 +202,7 @@ class WebInterfaceController extends Controller
                 $tmpOrders = explode(';', $request->get('wine'));
                 if (is_array($tmpOrders)) {
                     foreach ($tmpOrders as $key => $tmpOrder) {
-                        $tmpWines = explode(',', $tmpOrder);
+                        $tmpWines = explode(':', $tmpOrder);
                         if (is_array($tmpWines) && count($tmpWines) == 3) {
                             $post['wine'][$key]['amount'] = $tmpWines[0];
                             $post['wine'][$key]['price'] = $tmpWines[1];
@@ -262,8 +262,8 @@ class WebInterfaceController extends Controller
                 $post['country']    = $request->get('country');
                 $post['kind']       = $request->get('kind');
                 $post['type']       = $request->get('type');
-                $post['volume']     = $request->get('volume');
-                $post['price']      = $request->get('price');
+                $post['volume']     = str_replace(',', '.', $request->get('volume'));
+                $post['price']      = str_replace(',', '.', $request->get('price'));
                 $post['available']  = $request->get('available') == 'x' ? true : false;
                 $url = $this->generateUrl('wineadministration_api_editwine', array('searchCriteria' => $searchCriteria), true);
                 $wines = json_decode($this->postApiRequest($url, $post));
@@ -336,13 +336,13 @@ class WebInterfaceController extends Controller
         $post['country']    = $request->get('country');
         $post['kind']       = $request->get('kind');
         $post['type']       = $request->get('type');
-        $post['volume']     = $request->get('volume');
-        $post['price']      = $request->get('price');
+        $post['volume']     = str_replace(',', '.', $request->get('volume'));
+        $post['price']      = str_replace(',', '.', $request->get('price'));
         $post['available']  = $request->get('available') == 'x' ? true : false;
         $url = $this->generateUrl('wineadministration_api_addwine', array(), true);
         $wines = json_decode($this->postApiRequest($url, $post));
         return array(
-            'users' => $wines
+            'wines' => $wines
         );
     }
 
@@ -365,7 +365,7 @@ class WebInterfaceController extends Controller
         $tmpOrders = explode(';', $request->get('wine'));
         if (is_array($tmpOrders)) {
             foreach ($tmpOrders as $key => $tmpOrder) {
-                $tmpWines = explode(',', $tmpOrder);
+                $tmpWines = explode(':', $tmpOrder);
                 if (is_array($tmpWines)) {
                     $post['wine'][$key]['amount'] = $tmpWines[0];
                     $post['wine'][$key]['price'] = $tmpWines[1];
@@ -375,7 +375,7 @@ class WebInterfaceController extends Controller
         }
         $post['client']     = $request->get('client');
         $post['date']       = $request->get('orderdate');
-        $url = $this->generateUrl('wineadministration_api_addclient', array(), true);
+        $url = $this->generateUrl('wineadministration_api_addorder', array(), true);
         $users = json_decode($this->postApiRequest($url, $post));
         return array(
             'users' => $users

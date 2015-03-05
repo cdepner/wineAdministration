@@ -82,9 +82,9 @@ class Winetoclientorder
      * 
      * @var Clientorder
      *
-     * @ORM\ManyToOne(targetEntity="Clientorder", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="Clientorder")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="clientOrder", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     *   @ORM\JoinColumn(name="clientOrder", referencedColumnName="id", nullable=false)
      * })
      */
     private $clientOrder;

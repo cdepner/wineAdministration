@@ -42,7 +42,7 @@ class ApiController extends Controller
     /**
      * Api Client hinzufügen
      *
-     * @param Request $request array(
+     * @param Request $request POST|PUT
      *      forename    => String,
      *      surname     => String,
      *      street      => String,
@@ -50,7 +50,6 @@ class ApiController extends Controller
      *      city        => String,
      *      zipcode     => Int(5),
      *      phone       => String,String,...
-     * )
      *
      * @Route(
      *       "/weinverwaltung/api/add/client",
@@ -91,7 +90,7 @@ class ApiController extends Controller
     /**
      * Api Wein erstellen
      *
-     * @param Request $request array(
+     * @param Request $request POST|PUT
      *      available   => Bool,
      *      name        => String,
      *      vineyard    => String,
@@ -104,16 +103,11 @@ class ApiController extends Controller
      *      vintage     => Int(4),
      *      volume      => Float,
      *      price       => Float,
-     *      varietal => array(
-     *          String,
-     *          String,
-     *          ...
-     *      )
-     * )
+     *      varietal    => String,String,...
      *
      * @Route(
      *       "/weinverwaltung/api/add/wine",
-     *       methods = { "POST", "PUT" }
+     *       methods = { "GET", "POST", "PUT" }
      * )
      *
      * @return Response json
@@ -150,7 +144,7 @@ class ApiController extends Controller
     /**
      * Api Bestellung erstellen
      *
-     * @param Request $request array(
+     * @param Request $request POST|PUT
      *      client  => Int,
      *      date    => String,
      *      wine    => array(
@@ -158,11 +152,10 @@ class ApiController extends Controller
      *          price   => Float,
      *          wine    => Int
      *      )
-     * )
      *
      * @Route(
      *       "/weinverwaltung/api/add/order",
-     *       methods = { "GET", "POST", "PUT" }
+     *       methods = { "POST", "PUT" }
      * )
      *
      * @return Response json
@@ -631,13 +624,13 @@ class ApiController extends Controller
         /** @var WinetoclientorderRepository $winetoclientorderRepository */
         $winetoclientorderRepository = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetoclientorder');
         if ($searchCriteria != null && is_numeric($searchCriteria)) {
-            $clientorder = $clientorderRepository->findBy(array('id' => $searchCriteria));
+            $clientorder = $winetoclientorderRepository->getOrderByID($searchCriteria);
             $orders = $winetoclientorderRepository->findBy(array('clientOrder' => $clientorder));
         } elseif ($searchCriteria != null) {
-            $clientorder = $clientorderRepository->getOrderByName($searchCriteria);
+            $clientorder = $winetoclientorderRepository->getOrderByName($searchCriteria);
             $orders = $winetoclientorderRepository->findBy(array('clientOrder' => $clientorder));
         } else {
-            $clientorders = $clientorderRepository->findAll();
+            $clientorders = $winetoclientorderRepository->getAll();
             $orders = array();
             foreach ($clientorders as $clientorder) {
                 $orders = array_merge($orders, $winetoclientorderRepository->findBy(array('clientOrder' => $clientorder)));
@@ -800,24 +793,19 @@ class ApiController extends Controller
      * Api Client editieren
      *
      * @param string  $searchCriteria Client ID
-     * @param Request $request array(
+     * @param Request $request POST|PUT
      *      forename    => String,
      *      surname     => String,
      *      street      => String,
      *      streetno    => String,
      *      city        => String,
      *      zipcode     => Int(5),
-     *      phone       => array(
-     *          String,
-     *          String,
-     *          ...
-     *      )
-     * )
+     *      phone       => String,String,...
      *
      * @Route(
      *       "/weinverwaltung/api/edit/client/{searchCriteria}",
      *       requirements = { "searchCriteria" = "[0-9]+" },
-     *       methods      = { "GET", "POST", "PUT" }
+     *       methods      = { "POST", "PUT" }
      * )
      *
      * @return Response json
@@ -852,7 +840,7 @@ class ApiController extends Controller
      * Api Wine editieren
      *
      * @param string  $searchCriteria Wine ID
-     * @param Request $request array(
+     * @param Request $request POST|PUT
      *      available   => Bool,
      *      name        => String,
      *      vineyard    => String,
@@ -866,12 +854,11 @@ class ApiController extends Controller
      *      volume      => Float,
      *      price       => Float,
      *      varietal    => String,String
-     * )
      *
      * @Route(
      *       "/weinverwaltung/api/edit/wine/{searchCriteria}",
      *       requirements = { "searchCriteria" = "[0-9]+" },
-     *       methods      = { "GET", "POST", "PUT" }
+     *       methods      = { "POST", "PUT" }
      * )
      *
      * @return Response json
@@ -906,7 +893,7 @@ class ApiController extends Controller
      * Api Order editieren
      *
      * @param string  $orderId Order ID
-     * @param Request $request array(
+     * @param Request $request POST|PUT
      *      client  => Int,
      *      date    => String,
      *      wine    => array(
@@ -914,12 +901,11 @@ class ApiController extends Controller
      *          price   => Float,
      *          wine    => Int
      *      )
-     * )
      *
      * @Route(
      *       "/weinverwaltung/api/edit/order/{orderId}",
      *       requirements = {"orderId" = "[0-9]+"},
-     *       methods      = { "GET", "POST", "PUT" }
+     *       methods      = { "POST", "PUT" }
      * )
      *
      * @return Response json
@@ -991,10 +977,8 @@ class ApiController extends Controller
         $newWine['kind']        = $request->get('kind') != null        ? $request->get('kind')                    : $wine->getWinekind()->getName();
         $newWine['type']        = $request->get('type') != null        ? $request->get('type')                    : $wine->getWinetype()->getName();
         $newWine['varietal']    = $request->get('varietal') != null    ? explode(',', $request->get('varietal'))  : $this->getWineVarietal($wine);
-        if ($request->get('available') != null && $request->get('available') == 'x') {
-            $newWine['available'] = true;
-        } elseif ($request->get('available') != null && $request->get('available') == 'o') {
-            $newWine['available'] = false;
+        if ($request->get('available') != null && is_bool((bool)$request->get('available'))) {
+            $newWine['available'] = $request->get('available');
         } else {
             $newWine['available'] = $wine->getAvailable();
         }
@@ -1233,29 +1217,16 @@ class ApiController extends Controller
         $client = $cliendRepo->findOneBy(array('id' => $newOrder['client']));
         $clientorder->setClient($client);
         $clientorder->setOrderdate($newOrder['date']);
-        foreach ($newOrder['wine'] as $wine) {
-            $wineSet = false;
-            $wine['wine'] = $wineRepo->findOneBy(array('id' => $wine['id']));
-            foreach ($winetoclientorder as $key=>$persistedwine) {
-                /** @var Winetoclientorder $persistedwine */
-                if ($persistedwine->getId() == (int)$wine['id']) {
-                    $wineSet = true;
-                    $persistedwine->setPrice($wine['price']);
-                    $persistedwine->setAmount($wine['amount']);
-                    $em->persist($persistedwine);
-                    $em->flush();
-                    unset($winetoclientorder[$key]);
-                } elseif (!$wineSet) {
-                    $wineSet = true;
-                    $orderedWine = new Winetoclientorder($wine['amount'], $wine['price'], $clientorder, $wine['wine']);
-                    $em->persist($orderedWine);
-                    $em->flush();
-                }
-            }
-        }
-        foreach ($winetoclientorder as $wineToDelete) {
-            $em->remove($wineToDelete);
+        foreach ($winetoclientorder as $persistedwine) {
+            /** @var Winetoclientorder $persistedwine */
+            $em->remove($persistedwine);
             $em->flush();
+        }
+        foreach ($newOrder['wine'] as $wine) {
+            $wine['wine'] = $wineRepo->findOneBy(array('id' => $wine['id']));
+                $orderedWine = new Winetoclientorder($wine['amount'], $wine['price'], $clientorder, $wine['wine']);
+                $em->persist($orderedWine);
+                $em->flush();
         }
 
 

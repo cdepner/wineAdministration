@@ -1,25 +1,28 @@
 {% extends 'WineAdministrationBundle:Default:defaultLayout.html.twig' %}
 {% block title %}Weinverwaltung - Bestellungsverwaltung{% endblock %}
 {% block body %}
-    {% include 'WineAdministrationBundle:Default:navigation.html.twig' with {'activeMenu': 'order'} %}
+{% include 'WineAdministrationBundle:Default:navigation.html.twig' with {'activeMenu': 'order'} %}
     <div class="row">
         <div class="table">
             <div>
                 <div></div>
                 <div>Kunden ID</div>
                 <div>Bestelldatum</div>
-                <div>Bestellung ( Anzahl der Weine,Preis des Weines,Wein ID;...,...,...;... )</div>
+                <div>Bestellung ( Wein ID:Anzahl der Weine:Preis des Weines;...:...:...;... )</div>
             </div>
+{% set orderId = '' %}
 {% for order in orders %}
+{% if orderId != order.id %}
+{% set orderId = order.id %}
             <form id="order_edit_{{ order.id }}" action="{{ path('wineadministration_webinterface_editorder', { 'searchCriteria': order.id }) }}" method="POST">
                 <div>{{ order.id }}&nbsp;</div>
                 <div><input type="text" name="client" form="order_edit_{{ order.id }}" value="{{ order.client.id }}"></div>
                 <div><input type="text" name="orderdate" form="order_edit_{{ order.id }}" value="{{ order.orderDate.date|date("d.m.Y") }}"></div>
-{% set wineOrder = '' %}{% for wine in order.clientOrder %}{% set wineOrder = wineOrder ~ [wine.amount, wine.price, wine.wine.id]|join(',') ~ ';' %}{% endfor %}
+{% set wineOrder = '' %}{% for wine in order.clientOrder %}{% set wineOrder = wineOrder ~ [wine.wine.id, wine.amount, wine.price]|join(':') ~ ';' %}{% endfor %}
                 <div><input type="text" name="wine" form="order_edit_{{ order.id }}" value="{{ wineOrder }}"></div>
-                <div><button class="tiny button postfix" type="submit" name="submit" form="order_edit_{{ order.id }}" value=" Bearbeiten "><i class="fi-pencil"></i></button></div>
                 <div><button class="tiny button postfix radius" type="submit" name="delete" form="order_edit_{{ order.id }}" value=" Löschen "><i class="fi-x"></i></button></div>
             </form>
+{% endif %}
 {% endfor %}
             <form id="order_add" action="{{ path('wineadministration_webinterface_addorder') }}" method="POST">
                 <div></div>
