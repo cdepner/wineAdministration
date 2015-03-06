@@ -107,7 +107,7 @@ class ApiController extends Controller
      *
      * @Route(
      *       "/weinverwaltung/api/add/wine",
-     *       methods = { "GET", "POST", "PUT" }
+     *       methods = { "POST", "PUT" }
      * )
      *
      * @return Response json
@@ -415,14 +415,14 @@ class ApiController extends Controller
                 $winekindRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winekind');
                 $winekind = $winekindRepo->findOneBy(array('name' => $wineArray['kind']));
                 if (!$winekind) {
-                    $winekind = new Winekind($wineArray['name']);
+                    $winekind = new Winekind($wineArray['kind']);
                     $em->persist($winekind);
                     $em->flush();
                 }
                 $winetypeRepo = $this->getDoctrine()->getRepository('WineAdministrationBundle:Winetype');
                 $winetype = $winetypeRepo->findOneBy(array('name' => $wineArray['type']));
                 if (!$winetype) {
-                    $winetype = new Winetype($wineArray['name']);
+                    $winetype = new Winetype($wineArray['type']);
                     $em->persist($winetype);
                     $em->flush();
                 }
@@ -1083,9 +1083,8 @@ class ApiController extends Controller
             $phonesToDelet = $clientphoneRepo->findBy(array('client' => $client));
             foreach ($newClient['phone'] as $phone) {
                 foreach ($phonesToDelet as $key=>$phoneToDelete) {
-                    if ($phoneToDelete->getNumber() == $phone) {
-                        unset($phonesToDelet[$key]);
-                    }
+                    $em->remove($phoneToDelete);
+                    $em->flush();
                     $clientphone = $clientphoneRepo->findOneBy(array('number' => $phone, 'client' => $client));
                     if (!$clientphone) {
                         $clientphone = new Clientphone($phone, $client);
@@ -1093,10 +1092,6 @@ class ApiController extends Controller
                         $em->flush();
                     }
                 }
-            }
-            foreach ($phonesToDelet as $phoneToDelete) {
-                $em->remove($phoneToDelete);
-                $em->flush();
             }
         }
 
@@ -1179,7 +1174,7 @@ class ApiController extends Controller
                             $em->flush();
                         }
                         $winetovarietal = $winetowinevarietalRepo->findOneBy(array('wine' => $wine, 'winevarietal' => $winevarietal));
-                        if (!$winetovarietal) {
+                        if ($winetovarietal) {
                             $em->remove($winetovarietal);
                             $em->flush();
                         }

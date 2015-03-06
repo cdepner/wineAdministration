@@ -12,7 +12,7 @@
             </div>
 {% set orderId = '' %}
 {% for order in orders %}
-{% if orderId != order.id %}
+{% if order and orderId != order.id %}
 {% set orderId = order.id %}
             <form id="order_edit_{{ order.id }}" action="{{ path('wineadministration_webinterface_editorder', { 'searchCriteria': order.id }) }}" method="POST">
                 <div>{{ order.id }}&nbsp;</div>
